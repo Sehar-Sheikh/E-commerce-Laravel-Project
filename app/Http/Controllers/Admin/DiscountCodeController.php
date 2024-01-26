@@ -45,7 +45,7 @@ class DiscountCodeController extends Controller
 
                 $startAt = Carbon::createFromFormat('Y-m-d H:i:s', $request->starts_at);
 
-                if ($startAt->lte($now) == true) {
+                if ($startAt->lt($now) == true) {
                     return response()->json([
                         'status' => false,
                         'errors' => ['starts_at' => 'Start date cannot be less then current date time']
