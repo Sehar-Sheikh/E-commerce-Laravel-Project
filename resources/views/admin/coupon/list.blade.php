@@ -90,7 +90,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('categories.edit', $discountCoupon->id) }}">
+                                            <a href="{{ route('coupons.edit', $discountCoupon->id) }}">
                                                 <svg class="filament-link-icon w-4 h-4 mr-1"
                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                     fill="currentColor" aria-hidden="true">
@@ -99,7 +99,7 @@
                                                     </path>
                                                 </svg>
                                             </a>
-                                            <a href="#" onclick="deleteCategory({{ $discountCoupon->id }})"
+                                            <a href="#" onclick="deleteCoupon({{ $discountCoupon->id }})"
                                                 class="text-danger w-4 h-4 mr-1">
                                                 <svg wire:loading.remove.delay="" wire:target=""
                                                     class="filament-link-icon w-4 h-4 mr-1"
@@ -134,8 +134,8 @@
 
 @section('customJS')
     <script>
-        function deleteCategory(id) {
-            var url = '{{ route('categories.delete', 'ID') }}';
+        function deleteCoupon(id) {
+            var url = '{{ route('coupons.delete', 'ID') }}';
             var newUrl = url.replace("ID", id)
 
             if (confirm("Are you sure you want to delete?")) {
@@ -150,7 +150,7 @@
                     success: function(response) {
 
                         if (response["status"]) {
-                            window.location.href = "{{ route('categories.index') }}";
+                            window.location.href = "{{ route('coupons.index') }}";
                         }
                     }
                 });
