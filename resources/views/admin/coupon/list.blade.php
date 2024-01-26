@@ -6,10 +6,10 @@
         <div class="container-fluid my-2">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Categories</h1>
+                    <h1>Discount Coupons</h1>
                 </div>
                 <div class="col-sm-6 text-right">
-                    <a href="{{ route('categories.create') }}" class="btn btn-primary">New Category</a>
+                    <a href="{{ route('coupons.create') }}" class="btn btn-primary">New Discount Coupon</a>
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
                 <form action="" method="get">
                     <div class="card-header">
                         <div class="card-title">
-                            <button type="button" onclick="window.location.href='{{ route('categories.index') }}'"
+                            <button type="button" onclick="window.location.href='{{ route('coupons.index') }}'"
                                 class="btn btn-default btn-sm">Reset</button>
                         </div>
                         <div class="card-tools">
@@ -46,21 +46,33 @@
                         <thead>
                             <tr>
                                 <th width="60">ID</th>
+                                <th>Code</th>
                                 <th>Name</th>
-                                <th>Slug</th>
+                                <th>Discount</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
                                 <th width="100">Status</th>
                                 <th width="100">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @if ($categories->isNotEmpty())
-                                @foreach ($categories as $category)
+                            @if ($discountCoupons->isNotEmpty())
+                                @foreach ($discountCoupons as $discountCoupon)
                                     <tr>
-                                        <td>{{ $category->id }}</td>
-                                        <td>{{ $category->name }}</td>
-                                        <td>{{ $category->slug }}</td>
+                                        <td>{{ $discountCoupon->id }}</td>
+                                        <td>{{ $discountCoupon->code }}</td>
+                                        <td>{{ $discountCoupon->name }}</td>
                                         <td>
-                                            @if ($category->status == 1)
+                                            @if ($discountCoupon->type == 'percent')
+                                                {{ $discountCoupon->discount_amount }}%
+                                            @else
+                                                ${{ $discountCoupon->discount_amount }}
+                                            @endif
+                                        </td>
+                                        <td>{{ (!empty($discountCoupon->starts_at)) ? \Carbon\Carbon::parse($discountCoupon->starts_at)->format('Y/m/d H:i:s') : ''}}</td>
+                                        <td>{{ (!empty($discountCoupon->expires_at)) ? \Carbon\Carbon::parse($discountCoupon->expires_at)->format('Y/m/d H:i:s') : ''}}</td>
+                                        <td>
+                                            @if ($discountCoupon->status == 1)
                                                 <svg class="text-success-500 h-6 w-6 text-success"
                                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="2" stroke="currentColor" aria-hidden="true">
@@ -78,7 +90,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('categories.edit', $category->id) }}">
+                                            <a href="{{ route('categories.edit', $discountCoupon->id) }}">
                                                 <svg class="filament-link-icon w-4 h-4 mr-1"
                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                     fill="currentColor" aria-hidden="true">
@@ -87,7 +99,7 @@
                                                     </path>
                                                 </svg>
                                             </a>
-                                            <a href="#" onclick="deleteCategory({{ $category->id }})"
+                                            <a href="#" onclick="deleteCategory({{ $discountCoupon->id }})"
                                                 class="text-danger w-4 h-4 mr-1">
                                                 <svg wire:loading.remove.delay="" wire:target=""
                                                     class="filament-link-icon w-4 h-4 mr-1"
@@ -111,7 +123,7 @@
                     </table>
                 </div>
                 <div class="card-footer clearfix">
-                    {{ $categories->links() }}
+                    {{ $discountCoupons->links() }}
                 </div>
             </div>
         </div>

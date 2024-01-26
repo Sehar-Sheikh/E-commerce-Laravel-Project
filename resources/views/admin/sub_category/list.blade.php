@@ -124,29 +124,9 @@
 
 @section('customJS')
     <script>
-        // function deleteSubCategory(id) {
-        //     var url = '{{ route('sub-categories.delete', 'ID') }}';
-        //     var newUrl = url.replace("ID", id)
-
-        //     if (confirm("Are you sure you want to delete?")) {
-        //         $.ajax({
-        //             url: newUrl,
-        //             type: 'delete',
-        //             data: {},
-        //             dataType: 'json',
-        //             headers: {
-        //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //             },
-        //             success: function(response) {
-        //                 window.location.href = "{{ route('sub-categories.index') }}";
-        //             }
-        //         });
-        //     }
-        // }
-
         function deleteSubCategory(id) {
             var url = '{{ route('sub-categories.delete', 'ID') }}';
-            var newUrl = url.replace("ID", id);
+            var newUrl = url.replace("ID", id)
 
             if (confirm("Are you sure you want to delete?")) {
                 $.ajax({
@@ -154,16 +134,11 @@
                     type: 'delete',
                     data: {},
                     dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
                     success: function(response) {
-                        if (response["status"] == true) {
-                            if (response["message"]) {
-                                alert(response["message"]); // Display the delete success message
-                            }
-                            window.location.href = "{{ route('sub-categories.index') }}";
-                        } else {
-                            // Handle failure
-                            window.location.href = "{{ route('sub-categories.index') }}";
-                        }
+                        window.location.href = "{{ route('sub-categories.index') }}";
                     }
                 });
             }

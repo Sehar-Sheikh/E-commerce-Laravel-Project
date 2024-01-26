@@ -146,32 +146,9 @@
 
 @section('customJS')
     <script>
-        // function deleteProduct(id) {
-        //     var url = '{{ route('products.delete', 'ID') }}';
-        //     var newUrl = url.replace("ID", id)
-
-        //     if (confirm("Are you sure you want to delete?")) {
-        //         $.ajax({
-        //             url: newUrl,
-        //             type: 'delete',
-        //             data: {},
-        //             dataType: 'json',
-        //             success: function(response) {
-
-        //                 if (response["status"] == true) {
-        //                     window.location.href = "{{ route('products.index') }}";
-        //                 } else {
-        //                     window.location.href = "{{ route('products.index') }}";
-        //                 }
-        //             }
-        //         });
-        //     }
-        // }
-
-        //Showing delete message but not in alert
         function deleteProduct(id) {
             var url = '{{ route('products.delete', 'ID') }}';
-            var newUrl = url.replace("ID", id);
+            var newUrl = url.replace("ID", id)
 
             if (confirm("Are you sure you want to delete?")) {
                 $.ajax({
@@ -180,13 +157,10 @@
                     data: {},
                     dataType: 'json',
                     success: function(response) {
+
                         if (response["status"] == true) {
-                            if (response["message"]) {
-                                alert(response["message"]); // Display the delete success message
-                            }
                             window.location.href = "{{ route('products.index') }}";
                         } else {
-                            // Handle failure
                             window.location.href = "{{ route('products.index') }}";
                         }
                     }
