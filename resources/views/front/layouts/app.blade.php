@@ -63,7 +63,12 @@
                     </a>
                 </div>
                 <div class="col-lg-6 col-6 text-left  d-flex justify-content-end align-items-center">
-                    <a href="{{ route('account.profile') }}" class="nav-link text-dark">My Account</a>
+                    @if (Auth::check())
+                        <a href="{{ route('account.profile') }}" class="nav-link text-dark">My Account</a>
+                        @else
+                        <a href="{{ route('account.login') }}" class="nav-link text-dark">Login/Register</a>
+
+                    @endif
                     <form action="">
                         <div class="input-group">
                             <input type="text" placeholder="Search For Products" class="form-control"
