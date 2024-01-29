@@ -39,8 +39,6 @@ function orderEmail($orderId, $userType="customer")
         'order' => $order,
         'userType' => $userType
     ];
-
-
     Mail::to($email)->send(new OrderEmail($mailData));
 
 }
