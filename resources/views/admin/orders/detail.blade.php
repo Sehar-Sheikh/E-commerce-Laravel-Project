@@ -123,8 +123,8 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="">Shipped Date</label>
-                                    <input placeholder="Shipped Date" value="{{ $order->shipped_date }}" type="text" name="shipped_date"
-                                        id="shipped_date" class="form-control">
+                                    <input placeholder="Shipped Date" value="{{ $order->shipped_date }}" type="text"
+                                        name="shipped_date" id="shipped_date" class="form-control">
                                 </div>
                                 <div class="mb-3">
                                     <button class="btn btn-primary">Update</button>
@@ -134,16 +134,18 @@
                     </div>
                     <div class="card">
                         <div class="card-body">
-                            <h2 class="h4 mb-3">Send Inovice Email</h2>
-                            <div class="mb-3">
-                                <select name="status" id="status" class="form-control">
-                                    <option value="">Customer</option>
-                                    <option value="">Admin</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <button class="btn btn-primary">Send</button>
-                            </div>
+                            <form action="" method="post" name="sendInvoiceEmail" id="sendInvoiceEmail">
+                                <h2 class="h4 mb-3">Send Inovice Email</h2>
+                                <div class="mb-3">
+                                    <select name="userType" id="userType" class="form-control">
+                                        <option value="customer">Customer</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <button class="btn btn-primary">Send</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -165,6 +167,8 @@
 
         $("#changeOrderStatusForm").submit(function(event) {
             event.preventDefault();
+            if (confirm("Are you sure you want to change status?")) {
+
             $.ajax({
                 url: '{{ route('orders.changeOrderStatus', $order->id) }}',
                 type: 'post',
@@ -174,6 +178,22 @@
                     window.location.href = '{{ route('orders.detail', $order->id) }}';
                 }
             });
+        }
+        });
+
+        $("#sendInvoiceEmail").submit(function(event) {
+            event.preventDefault();
+            if (confirm("Are you sure you want to send email?")) {
+                $.ajax({
+                    url: '{{ route('orders.sendInvoiceEmail', $order->id) }}',
+                    type: 'post',
+                    data: $(this).serializeArray(),
+                    dataType: 'json',
+                    success: function(response) {
+                        window.location.href = '{{ route('orders.detail', $order->id) }}';
+                    }
+                });
+            }
         });
     </script>
 @endsection
