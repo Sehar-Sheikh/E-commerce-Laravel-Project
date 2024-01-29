@@ -303,6 +303,10 @@ class CartController extends Controller
                 $orderItem->total = $item->price * $item->qty;
                 $orderItem->save();
             }
+
+            //Send Order Email
+            orderEmail($order->id);
+
             session()->flash('success', 'You have successfully placed your order');
 
             Cart::destroy();
@@ -362,7 +366,7 @@ class CartController extends Controller
                 return response()->json([
                     'status' => true,
                     'grandTotal' => number_format($grandTotal, 2),
-                    'discount' => number_format($discount,2),
+                    'discount' => number_format($discount, 2),
                     'discountString' => $discountString,
                     'shippingCharge' =>  number_format($shippingCharge, 2)
                 ]);
@@ -375,7 +379,7 @@ class CartController extends Controller
                 return response()->json([
                     'status' => true,
                     'grandTotal' => number_format($grandTotal, 2),
-                    'discount' => number_format($discount,2),
+                    'discount' => number_format($discount, 2),
                     'discountString' => $discountString,
                     'shippingCharge' =>  number_format($shippingCharge, 2)
                 ]);
@@ -385,7 +389,7 @@ class CartController extends Controller
             return response()->json([
                 'status' => true,
                 'grandTotal' => number_format(($subTotal - $discount), 2),
-                'discount' => number_format($discount,2),
+                'discount' => number_format($discount, 2),
                 'discountString' => $discountString,
                 'shippingCharge' =>  number_format(0, 2)
             ]);

@@ -36,6 +36,10 @@ use Illuminate\Support\Str;
 //     return view('welcome');
 // });
 
+// Route::get('/test', function () {
+// orderEmail(13);
+// });
+
 Route::get('/', [FrontController::class, 'index'])->name('front.home');
 Route::get('/shop/{categorySlug?}/{subCategorySlug?}', [ShopController::class, 'index'])->name('front.shop');
 Route::get('/product/{slug}', [ShopController::class, 'product'])->name('front.product');
