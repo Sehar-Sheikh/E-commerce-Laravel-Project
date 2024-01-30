@@ -83,7 +83,8 @@
 @section('customJs')
     <script>
         function removeProduct(id) {
-            $.ajax({
+            if (confirm("Are you sure you want to delete?")) {
+                $.ajax({
                 url: '{{ route('account.removeProductFromWishlist') }}',
                 type: 'post',
                 data: {
@@ -96,6 +97,8 @@
                     }
                 }
             });
+            }
+
         }
     </script>
 @endsection
