@@ -18,8 +18,6 @@ class ShopController extends Controller
 
         $categories = Category::orderBy('name', 'ASC')->with('sub_category')->where('status', 1)->get();
         $brands = Brand::orderBy('name', 'ASC')->where('status', 1)->get();
-
-
         $products = Product::where('status', 1);
 
         //Apply filters here
@@ -86,7 +84,7 @@ class ShopController extends Controller
         //Fetch related products
         if ($product->related_products != '') {
             $productArray = explode(',',$product->related_products);
-            $relatedProducts = Product::whereIn('id',$productArray)->get();
+            $relatedProducts = Product::whereIn('id',$productArray)->where('status', 1)->get();
         }
 
         $data['product'] = $product;
