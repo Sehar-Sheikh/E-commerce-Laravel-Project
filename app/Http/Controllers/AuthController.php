@@ -20,6 +20,7 @@ class AuthController extends Controller
     {
         return view('front.account.login');
     }
+
     public function register()
     {
         return view('front.account.register');
@@ -53,6 +54,7 @@ class AuthController extends Controller
             ]);
         }
     }
+
     public function authenticate(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -82,10 +84,10 @@ class AuthController extends Controller
     public function profile()
     {
         $userId = Auth::user()->id;
-        $countries = Country::orderBy('name','ASC')->get();
+        $countries = Country::orderBy('name', 'ASC')->get();
         $user = User::where('id', $userId)->first();
 
-        $address = CustomerAddress::where('user_id',$userId)->first();
+        $address = CustomerAddress::where('user_id', $userId)->first();
         return view('front.account.profile', [
             'user' => $user,
             'countries' => $countries,
@@ -96,9 +98,9 @@ class AuthController extends Controller
     public function updateProfile(Request $request)
     {
         $userId = Auth::user()->id;
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email,'.$userId.',id',
+            'email' => 'required|email|unique:users,email,' . $userId . ',id',
             'phone' => 'required'
         ]);
 
@@ -109,12 +111,12 @@ class AuthController extends Controller
             $user->phone = $request->phone;
             $user->save();
 
-            session()->flash('success' ,'Profile updated successfully.');
+            session()->flash('success', 'Profile updated successfully.');
             return response()->json([
                 'status' => true,
                 'message' => 'Profile updated successfully.'
             ]);
-        }else {
+        } else {
             return response()->json([
                 'status' => false,
                 'errors' => $validator->errors()
@@ -125,7 +127,7 @@ class AuthController extends Controller
     public function updateAddress(Request $request)
     {
         $userId = Auth::user()->id;
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'first_name' => 'required|min:5',
             'last_name' => 'required',
             'email' => 'required|email',
@@ -138,11 +140,6 @@ class AuthController extends Controller
         ]);
 
         if ($validator->passes()) {
-            // $user = User::find($userId);
-            // $user->name = $request->name;
-            // $user->email = $request->email;
-            // $user->phone = $request->phone;
-            // $user->save();
 
             CustomerAddress::updateOrCreate(
                 ['user_id' => $userId],
@@ -161,12 +158,12 @@ class AuthController extends Controller
                 ]
             );
 
-            session()->flash('success' ,'Address updated successfully.');
+            session()->flash('success', 'Address updated successfully.');
             return response()->json([
                 'status' => true,
                 'message' => 'Profile updated successfully.'
             ]);
-        }else {
+        } else {
             return response()->json([
                 'status' => false,
                 'errors' => $validator->errors()
@@ -227,6 +224,46 @@ class AuthController extends Controller
             session()->flash('success', 'Product removed successfully.');
             return response()->json([
                 'status' => true,
+            ]);
+        }
+    }
+
+    public function showChangePasswordForm()
+    {
+        return view('front.account.change-password');
+    }
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'old_password' => 'required',
+            'new_password' => 'required|min:5',
+            'confirm_password' => 'required|same:new_password'
+        ]);
+
+        if ($validator->passes()) {
+            $user = User::select('id', 'password')->where('id', Auth::user()->id)->first();
+
+            if (!Hash::check($request->old_password, $user->password)) {
+                session()->flash('error', 'Your old password is incorrect! Please try again.');
+                return response()->json([
+                    'status' => true,
+                ]);
+            }
+
+            User::where('id',$user->id)->update([
+                'password' => Hash::make($request->new_password)
+            ]);
+
+            session()->flash('success', 'You have successfully changed your password.');
+                return response()->json([
+                    'status' => true,
+                ]);
+
+
+        } else {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
             ]);
         }
     }
