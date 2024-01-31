@@ -70,8 +70,8 @@
                     @endif
                     <form action="{{ route('front.shop') }}" method="get">
                         <div class="input-group">
-                            <input value="{{ Request::get('search') }}" type="text" placeholder="Search For Products" class="form-control"
-                                name="search" id="search">
+                            <input value="{{ Request::get('search') }}" type="text" placeholder="Search For Products"
+                                class="form-control" name="search" id="search">
                             <button type="submit" class="input-group-text">
                                 <i class="fa fa-search"></i>
                             </button>
@@ -148,11 +148,12 @@
                     <div class="footer-card">
                         <h3>Important Links</h3>
                         <ul>
-                            <li><a href="about-us.php" title="About">About</a></li>
-                            <li><a href="contact-us.php" title="Contact Us">Contact Us</a></li>
-                            <li><a href="#" title="Privacy">Privacy</a></li>
-                            <li><a href="#" title="Privacy">Terms & Conditions</a></li>
-                            <li><a href="#" title="Privacy">Refund Policy</a></li>
+                            @if (staticPages()->isNotEmpty())
+                                @foreach (staticPages() as $page)
+                                    <li><a href="{{ route('front.page', $page->slug) }}"
+                                            title="{{ $page->name }}si">{{ $page->name }}</a></li>
+                                @endforeach
+                            @endif
                         </ul>
                     </div>
                 </div>
@@ -191,7 +192,7 @@
                     <h5 class="modal-title" id="exampleModalLabel">Success</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" >
+                <div class="modal-body">
 
                 </div>
                 <div class="modal-footer">

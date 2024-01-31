@@ -53,6 +53,7 @@ Route::post('/get-order-summery', [CartController::class, 'getOrderSummery'])->n
 Route::post('/apply-discount', [CartController::class, 'applyDiscount'])->name('front.applyDiscount');
 Route::post('/remove-discount', [CartController::class, 'removeCoupon'])->name('front.removeCoupon');
 Route::post('/add-to-wishlist', [FrontController::class, 'addToWishlist'])->name('front.addToWishlist');
+Route::get('/page/{slug}', [FrontController::class, 'page'])->name('front.page');
 
 
 Route::group(['prefix' => 'account'], function () {
@@ -61,7 +62,6 @@ Route::group(['prefix' => 'account'], function () {
         Route::post('/process-register', [AuthController::class, 'processRegister'])->name('account.processRegister');
         Route::get('/login', [AuthController::class, 'login'])->name('account.login');
         Route::post('/login', [AuthController::class, 'authenticate'])->name('account.authenticate');
-
     });
 
     Route::group(['middleware' => 'auth'], function () {
@@ -73,9 +73,6 @@ Route::group(['prefix' => 'account'], function () {
         Route::get('/logout', [AuthController::class, 'logout'])->name('account.logout');
         Route::post('/remove-product-from-wishlist', [AuthController::class, 'removeProductFromWishlist'])->name('account.removeProductFromWishlist');
         Route::get('/my-wishlist', [AuthController::class, 'wishlist'])->name('account.wishlist');
-
-
-
     });
 });
 
