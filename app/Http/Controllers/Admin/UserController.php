@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -42,11 +43,12 @@ class UserController extends Controller
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->phone;
+            $user->status = $request->status;
             $user->password = Hash::make($request->password);
             $user->save();
 
             $message = 'User added successfully.';
-            session()->flash('success',$message);
+            session()->flash('success', $message);
             return response()->json([
                 'status' => true,
                 'message' => $message
@@ -57,5 +59,85 @@ class UserController extends Controller
                 'errors' => $validator->errors()
             ]);
         }
+    }
+
+    public function edit(Request $request, $id)
+    {
+        $user = User::find($id);
+        if ($user == null) {
+            $message = 'User not found.';
+
+            session()->flash('error', $message);
+            return redirect()->route('users.index');
+        }
+        return view('admin.users.edit', [
+            'user' => $user
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::find($id);
+        if ($user == null) {
+            $message = 'User not found.';
+
+            session()->flash('error', $message);
+
+            return response()->json([
+                'status' => true,
+                'message' => $message
+            ]);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $id . ',id',
+            'phone' => 'required'
+        ]);
+
+        if ($validator->passes()) {
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->phone = $request->phone;
+            $user->status = $request->status;
+            if ($request->password != '') {
+                $user->password = Hash::make($request->password);
+            }
+            $user->save();
+
+            $message = 'User updated successfully.';
+            session()->flash('success', $message);
+            return response()->json([
+                'status' => true,
+                'message' => $message
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
+    }
+
+    public function destroy($id)
+    {
+        $user = User::find($id);
+        if ($user == null) {
+            $message = 'User not found.';
+
+            session()->flash('error', $message);
+            return response()->json([
+                'status' => true,
+                'message' => $message
+            ]);
+        }
+        $user->delete();
+        $message = 'User deleted successfully.';
+
+            session()->flash('success', $message);
+            return response()->json([
+                'status' => true,
+                'message' => $message
+            ]);
     }
 }

@@ -81,7 +81,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            {{-- <a href="{{ route('catgories.edit', $user->id) }}"> --}}
+                                            <a href="{{ route('users.edit', $user->id) }}">
                                                 <svg class="filament-link-icon w-4 h-4 mr-1"
                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                     fill="currentColor" aria-hidden="true">
@@ -90,7 +90,7 @@
                                                     </path>
                                                 </svg>
                                             </a>
-                                            <a href="#" onclick="deleteuser({{ $user->id }})"
+                                            <a href="#" onclick="deleteUser({{ $user->id }})"
                                                 class="text-danger w-4 h-4 mr-1">
                                                 <svg wire:loading.remove.delay="" wire:target=""
                                                     class="filament-link-icon w-4 h-4 mr-1"
@@ -125,27 +125,27 @@
 
 @section('customJS')
     <script>
-        // function deleteuser(id) {
-        //     var url = '';
-        //     var newUrl = url.replace("ID", id)
+        function deleteUser(id) {
+            var url = '{{ route('users.delete',"ID") }}';
+            var newUrl = url.replace("ID", id)
 
-        //     if (confirm("Are you sure you want to delete?")) {
-        //         $.ajax({
-        //             url: newUrl,
-        //             type: 'delete',
-        //             data: {},
-        //             dataType: 'json',
-        //             headers: {
-        //                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //             },
-        //             success: function(response) {
+            if (confirm("Are you sure you want to delete?")) {
+                $.ajax({
+                    url: newUrl,
+                    type: 'delete',
+                    data: {},
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
 
-        //                 if (response["status"]) {
-        //                     window.location.href = "{{ route('users.index') }}";
-        //                 }
-        //             }
-        //         });
-        //     }
-        // }
+                        if (response["status"]) {
+                            window.location.href = "{{ route('users.index') }}";
+                        }
+                    }
+                });
+            }
+        }
     </script>
 @endsection
