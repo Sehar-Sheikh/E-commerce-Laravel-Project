@@ -68,7 +68,7 @@
                                                     </path>
                                                 </svg>
                                             </a>
-                                            <a href="#" onclick="deletepage({{ $page->id }})"
+                                            <a href="#" onclick="deletePage({{ $page->id }})"
                                                 class="text-danger w-4 h-4 mr-1">
                                                 <svg wire:loading.remove.delay="" wire:target=""
                                                     class="filament-link-icon w-4 h-4 mr-1"
@@ -102,8 +102,8 @@
 @endsection
 
 @section('customJS')
-    {{-- <script>
-        function deletepage(id) {
+    <script>
+        function deletePage(id) {
             var url = '{{ route('pages.delete', 'ID') }}';
             var newUrl = url.replace("ID", id)
 
@@ -125,5 +125,5 @@
                 });
             }
         }
-    </script> --}}
+    </script>
 @endsection

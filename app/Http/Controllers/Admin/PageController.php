@@ -7,17 +7,18 @@ use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Js;
 
 class PageController extends Controller
 {
     public function index(Request $request)
     {
-        $pages= Page::latest();
-        if ($request->keyWord != '' ) {
-            $pages = $pages->where('name','like','%'.$request->keyWord.'%');
+        $pages = Page::latest();
+        if ($request->keyWord != '') {
+            $pages = $pages->where('name', 'like', '%' . $request->keyWord . '%');
         }
         $pages = $pages->paginate(10);
-        return view('admin.pages.list',[
+        return view('admin.pages.list', [
             'pages' => $pages
         ]);
     }
@@ -47,21 +48,76 @@ class PageController extends Controller
 
         $message = 'Page added successfully.';
 
-        session()->flash('success',$message);
+        session()->flash('success', $message);
         return response()->json([
             'status' => true,
             'success' => $message
         ]);
+    }
+    public function edit(Request $request, $id)
+    {
+        $page = Page::find($id);
+        if ($page == null) {
+            session()->flash('error','Page not found');
+            return redirect()->route('pages.index');
+        }
+        return view('admin.pages.edit',[
+            'page' => $page
+        ]);
+    }
+    public function update(Request $request, $id)
+    {
+        $page = Page::find($id);
+        if ($page == null) {
+            session()->flash('error','Page not found');
+            return response()->json([
+                'status' => true
+            ]);
+        }
 
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'slug' => 'required'
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
+
+        $page->name = $request->name;
+        $page->slug = $request->slug;
+        $page->content = $request->content;
+        $page->save();
+
+        $message = 'Page updated successfully.';
+
+        session()->flash('success', $message);
+        return response()->json([
+            'status' => true,
+            'success' => $message
+        ]);
     }
-    public function edit()
+    public function destroy($id)
     {
-    }
-    public function update()
-    {
-    }
-    public function destroy()
-    {
+        $page = Page::find($id);
+        if ($page == null) {
+            session()->flash('error','Page not found');
+            return response()->json([
+                'status' => true
+            ]);
+        }
+
+        $page->delete();
+
+        $message = 'Page deleted successfully.';
+
+        session()->flash('success', $message);
+        return response()->json([
+            'status' => true,
+            'success' => $message
+        ]);
     }
 }
