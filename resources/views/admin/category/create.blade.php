@@ -19,7 +19,7 @@
     <section class="content">
         <!-- Default box -->
         <div class="container-fluid">
-            <form action="{{ route('categories.store') }}" method="POST" id="categoryForm" name="categoryForm">
+            <form action="" method="POST" id="categoryForm" name="categoryForm">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
