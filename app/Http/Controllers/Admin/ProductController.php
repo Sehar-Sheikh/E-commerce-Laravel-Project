@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductRating;
 use App\Models\SubCategory;
 use App\Models\TempImage;
 use Illuminate\Http\Request;
@@ -75,7 +76,7 @@ class ProductController extends Controller
             $product->is_featured = $request->is_featured;
             $product->short_description = $request->short_description;
             $product->shipping_returns = $request->shipping_returns;
-            $product->related_products = (!empty($request->related_products) ? implode(',',$request->related_products) : '');
+            $product->related_products = (!empty($request->related_products) ? implode(',', $request->related_products) : '');
             $product->save();
 
             //Save Gallery Images
@@ -147,8 +148,8 @@ class ProductController extends Controller
         $relatedProducts = [];
         //Fetch related products
         if ($product->related_products != '') {
-            $productArray = explode(',',$product->related_products);
-            $relatedProducts = Product::whereIn('id',$productArray)->with('product_images')->get();
+            $productArray = explode(',', $product->related_products);
+            $relatedProducts = Product::whereIn('id', $productArray)->with('product_images')->get();
         }
 
         $data = [];
@@ -202,7 +203,7 @@ class ProductController extends Controller
             $product->is_featured = $request->is_featured;
             $product->short_description = $request->short_description;
             $product->shipping_returns = $request->shipping_returns;
-            $product->related_products = (!empty($request->related_products) ? implode(',',$request->related_products) : '');
+            $product->related_products = (!empty($request->related_products) ? implode(',', $request->related_products) : '');
             $product->save();
 
             session()->flash('success', 'Product updated successfully.');
@@ -268,6 +269,59 @@ class ProductController extends Controller
         return response()->json([
             'tags' => $tempProduct,
             'status' => true
+        ]);
+    }
+
+    public function productRatings(Request $request)
+    {
+        $ratings = ProductRating::select('product_ratings.*', 'products.title as productTitle')
+            ->orderBy('product_ratings.created_at', 'DESC');
+
+        $ratings = $ratings->leftJoin('products', 'products.id', 'product_ratings.product_id');
+
+        if ($request->get('keyWord') != "") {
+            $ratings = $ratings->orWhere('products.title', 'like', '%' . $request->keyWord . '%');
+            $ratings = $ratings->orWhere('product_ratings.username', 'like', '%' . $request->keyWord . '%');
+        }
+        $ratings = $ratings->paginate(10);
+
+        return view('admin.products.ratings', [
+            'ratings' => $ratings
+        ]);
+    }
+
+    public function changeRatingStatus(Request $request)
+    {
+        $productRating = ProductRating::find($request->id);
+        $productRating->status = $request->status;
+        $productRating->save();
+
+        session()->flash('success', 'Status changed successfully.');
+        return response()->json([
+            'status' => true,
+        ]);
+    }
+
+    public function deleteRating($id, Request $request)
+    {
+        $rating = ProductRating::find($id);
+
+        if (empty($rating)) {
+
+            session()->flash('error', 'Record not found.');
+
+            return response()->json([
+                'status' => false,
+                'notFound' => true
+            ]);
+        }
+
+        $rating->delete();
+        session()->flash('success', 'Rating deleted successfully');
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Rating deleted successfully'
         ]);
     }
 }
