@@ -129,25 +129,28 @@ class CartController extends Controller
     public function checkout()
     {
         $discount = 0;
-        // if cart is empty redirect to cart page
+
+        // if cart is empty, redirect to cart page
         if (Cart::count() == 0) {
             return redirect()->route('front.cart');
         }
 
-        session(['url.intended' => url()->current()]);
-
-        //if user is not logged in then redirect to login page
+        // if the user is not logged in, then redirect to the login page
         if (Auth::check() == false) {
+            if (!session()->has('url.intended')) {
+                session(['url.intended' => url()->current()]);
+            }
             return redirect()->route('account.login');
         }
+        session()->forget('url.intended');
 
         $customerAddress = CustomerAddress::where('user_id', Auth::user()->id)->first();
-        session()->forget('url.intended');
 
         $countries = Country::orderBy('name', 'ASC')->get();
 
         $subTotal = Cart::subtotal(2, '.', '');
-        //Apply Discount here
+
+        // Apply Discount here
         if (session()->has('code')) {
             $code = session('code');
 
@@ -159,32 +162,41 @@ class CartController extends Controller
         }
 
         //Calculate shipping here
-        if ($customerAddress != null) {
-            $userCountry = $customerAddress->country_id;
-            $shippingInfo = ShippingCharge::where('country_id', $userCountry)->first();
+        $userCountry = ($customerAddress != null) ? $customerAddress->country_id : null;
+        $shippingInfo = ShippingCharge::where('country_id', $userCountry)->first();
 
-            $totalQty = 0;
-            $totalShippingCharge = 0;
-            $grandTotal = 0;
-            foreach (Cart::content() as $item) {
-                $totalQty += $item->qty;
+        if ($shippingInfo === null) {
+            // If the shipping information for the user's country is not found,
+            // assume it is "Rest of the World" and fetch the corresponding charge
+            $shippingInfo = ShippingCharge::where('country_id', 'rest_of_world')->first();
+
+            if ($shippingInfo === null) {
+                // Handle the case where "Rest of the World" charge is not set
+                return redirect()->route('front.cart')->with('error', 'Shipping charge not set for Rest of the World.');
             }
-            $totalShippingCharge = $totalQty * $shippingInfo->amount;
-            $grandTotal = ($subTotal - $discount) + $totalShippingCharge;
-        } else {
-            $grandTotal = ($subTotal - $discount);
-            $totalShippingCharge = 0;
         }
+
+        $totalQty = 0;
+        $totalShippingCharge = 0;
+        $grandTotal = 0;
+
+        foreach (Cart::content() as $item) {
+            $totalQty += $item->qty;
+        }
+
+        $totalShippingCharge = $totalQty * $shippingInfo->amount;
+        $grandTotal = ($subTotal - $discount) + $totalShippingCharge;
 
         return view('front.checkout', [
             'countries' => $countries,
             'customerAddress' => $customerAddress,
             'totalShippingCharge' => $totalShippingCharge,
             'discount' => $discount,
-            'grandTotal' => $grandTotal
-
+            'grandTotal' => $grandTotal,
+            'restOfTheWorldShippingInfo' => $shippingInfo
         ]);
     }
+
 
     public function processCheckout(Request $request)
     {
