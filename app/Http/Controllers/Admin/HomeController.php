@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\TempImage;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class HomeController extends Controller
 {
@@ -45,6 +47,29 @@ class HomeController extends Controller
             ->whereDate('created_at', '>=', $lastThirtyDaysStartDate)
             ->whereDate('created_at', '<=', $currentDate)
             ->sum('grand_total');
+
+
+        //Delete temp images from db
+        $dayBeforeToday = Carbon::now()->subDays(1)->format('Y-m-d H:i:s');
+
+        $tempImages = TempImage::where('created_at', '<=', $dayBeforeToday)->get();
+
+        foreach ($tempImages as $tempImage) {
+            $path = public_path('/temp/' . $tempImage->name);
+            $thumbpath = public_path('/temp/thumb/' . $tempImage->name);
+
+            //Delete Main image
+            if (File::exists($path)) {
+                File::delete($path);
+            }
+
+            //Delete Thumb image
+            if (File::exists($thumbpath)) {
+                File::delete($thumbpath);
+            }
+            //Delete temp images from DB
+            TempImage::where('id', $tempImage->id)->delete();
+        }
 
         return view('admin.dashboard', [
             'totalOrders' => $totalOrders,

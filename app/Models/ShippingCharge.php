@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class ShippingCharge extends Model
 {
     use HasFactory;
+    protected $fillable = ['country_id', 'amount'];
+
 }

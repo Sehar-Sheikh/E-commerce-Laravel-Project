@@ -72,7 +72,6 @@ class AuthController extends Controller
 
                 if (session()->has('url.intended')) {
                     return redirect(session()->get('url.intended'));
-                    session()->forget('url.intended');
                 }
                 return redirect()->route('account.profile');
             } else {
