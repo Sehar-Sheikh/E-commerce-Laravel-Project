@@ -38,6 +38,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/ion.rangeSlider.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/style.css') }}" />
 
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,12 +63,9 @@
                         <span class="h1 text-uppercase text-dark bg-primary px-2 ml-n1">SHOP</span>
                     </a>
                 </div>
+
                 <div class="col-lg-6 col-6 text-left  d-flex justify-content-end align-items-center">
-                    @if (Auth::check())
-                        <a href="{{ route('account.profile') }}" class="nav-link text-dark">My Account</a>
-                    @else
-                        <a href="{{ route('account.login') }}" class="nav-link text-dark">Login/Register</a>
-                    @endif
+
                     <form action="{{ route('front.shop') }}" method="get">
                         <div class="input-group">
                             <input value="{{ Request::get('search') }}" type="text" placeholder="Search For Products"
@@ -77,7 +75,35 @@
                             </button>
                         </div>
                     </form>
+
+                    @if (Auth::check())
+                        <div class="dropdown">
+                            <a href="#" data-toggle="dropdown" class="nav-icon pe-md-0">
+                                <div class="image-avator d-flex justify-content-end"
+                                    style="height: 50px;width: 50px; border-radius: 50%; margin-left:15px;">
+                                    <img src="{{ asset('admin-assets/img/avatar5.png') }}" class="avatar img-fluid"
+                                        style="border-radius: inherit;" alt="">
+                                </div>
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="navbarDropdownMenuLink">
+                                <h4 class="h5 m-2 mb-0"><strong>{{ Auth::user()->name }}</strong></h5>
+                                    <div class="m-1 mb-2 p-2" style="font-size: 13px">{{ Auth::user()->email }}</div>
+                                    <div class="dropdown-divider"></div>
+
+                                    <a class="dropdown-item" href="{{ route('account.profile') }}">
+                                        <i class="fas fa-solid fa-user mr-2"></i> Profile
+                                    </a>
+                                    <a href="{{ route('account.logout') }}" class="dropdown-item text-danger">
+                                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                    </a>
+                            </ul>
+                        </div>
+                    @else
+                        <a href="{{ route('account.login') }}" class="nav-link text-dark">Login/Register</a>
+                    @endif
                 </div>
+
             </div>
         </div>
     </div>
@@ -162,9 +188,9 @@
                     <div class="footer-card">
                         <h3>My Account</h3>
                         <ul>
-                            <li><a href="#" title="Sell">Login</a></li>
-                            <li><a href="#" title="Advertise">Register</a></li>
-                            <li><a href="#" title="Contact Us">My Orders</a></li>
+                            <li><a href="{{ route('account.login') }}" title="Sell">Login</a></li>
+                            <li><a href="{{ route('account.register') }}" title="Advertise">Register</a></li>
+                            <li><a href="{{ route('account.orders') }}" title="Contact Us">My Orders</a></li>
                         </ul>
                     </div>
                 </div>
@@ -201,14 +227,28 @@
             </div>
         </div>
     </div>
-    <script src="{{ asset('front-assets/js/jquery-3.6.0.min.js') }}"></script>
+
+
+    {{-- <script src="{{ asset('front-assets/js/jquery-3.6.0.min.js') }}"></script>
     <script src="{{ asset('front-assets/js/bootstrap.bundle.5.1.3.min.js') }}"></script>
     <script src="{{ asset('front-assets/js/instantpages.5.1.0.min.js') }}"></script>
 
     <script src="{{ asset('front-assets/js/lazyload.17.6.0.min.js') }}"></script>
     <script src="{{ asset('front-assets/js/slick.min.js') }}"></script>
     <script src="{{ asset('front-assets/js/ion.rangeSlider.min.js') }}"></script>
+    <script src="{{ asset('front-assets/js/custom.js') }}"></script> --}}
+
+    <!-- jQuery -->
+    <script src="{{ asset('front-assets/js/jquery-3.6.0.min.js') }}"></script>
+    <!-- Bootstrap JS -->
+    <script src="{{ asset('admin-assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- Your Custom Scripts -->
+    <script src="{{ asset('front-assets/js/instantpages.5.1.0.min.js') }}"></script>
+    <script src="{{ asset('front-assets/js/lazyload.17.6.0.min.js') }}"></script>
+    <script src="{{ asset('front-assets/js/slick.min.js') }}"></script>
+    <script src="{{ asset('front-assets/js/ion.rangeSlider.min.js') }}"></script>
     <script src="{{ asset('front-assets/js/custom.js') }}"></script>
+
 
     <script>
         window.onscroll = function() {

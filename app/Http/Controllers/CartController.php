@@ -7,13 +7,18 @@ use App\Models\CustomerAddress;
 use App\Models\DiscountCoupon;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ShippingCharge;
 use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
+
 
 class CartController extends Controller
 {
@@ -166,12 +171,10 @@ class CartController extends Controller
         $shippingInfo = ShippingCharge::where('country_id', $userCountry)->first();
 
         if ($shippingInfo === null) {
-            // If the shipping information for the user's country is not found,
-            // assume it is "Rest of the World" and fetch the corresponding charge
+            // If the shipping information for the user's country is not found
             $shippingInfo = ShippingCharge::where('country_id', 'rest_of_world')->first();
 
             if ($shippingInfo === null) {
-                // Handle the case where "Rest of the World" charge is not set
                 return redirect()->route('front.cart')->with('error', 'Shipping charge not set for Rest of the World.');
             }
         }
@@ -300,50 +303,61 @@ class CartController extends Controller
             $order->zip = $request->zip;
             $order->notes = $request->order_notes;
             $order->country_id = $request->country;
+            $order->payment_method = $request->payment_method;
 
             $order->save();
 
-            // step-4 : Store order items in order items table
-
-            foreach (Cart::content() as $item) {
-                $orderItem = new OrderItem();
-                $orderItem->product_id = $item->id;
-                $orderItem->order_id = $order->id;
-                $orderItem->name = $item->name;
-                $orderItem->qty = $item->qty;
-                $orderItem->price = $item->price;
-                $orderItem->total = $item->price * $item->qty;
-                $orderItem->save();
-
-                //Update product stock
-
-                $productData = Product::find($item->id);
-                if ($productData->track_qty == 'Yes') {
-                    $currentQty = $productData->qty;
-                    $updatedQty = $currentQty - $item->qty;
-                    $productData->qty = $updatedQty;
-                    $productData->save();
-                }
-            }
-
-            //Send Order Email
-            orderEmail($order->id, 'customer');
-
-            session()->flash('success', 'You have successfully placed your order');
-
-            Cart::destroy();
-
-            session()->forget('code');
-
-            return response()->json([
-                'message' => 'Order placed successfully',
-                'orderId' => $order->id,
-                'status' => true,
+            // Create a record in the payment_methods table
+            $paymentMethod = new PaymentMethod([
+                'order_id' => $order->id,
+                'method' => 'cod',
+                'payment_status' => 'not paid',
             ]);
-        } else {
-            # code...
+
+            $order->paymentMethod()->save($paymentMethod);
+
+
+        // step-4 : Store order items in order items table
+
+        foreach (Cart::content() as $item) {
+            $orderItem = new OrderItem();
+            $orderItem->product_id = $item->id;
+            $orderItem->order_id = $order->id;
+            $orderItem->name = $item->name;
+            $orderItem->qty = $item->qty;
+            $orderItem->price = $item->price;
+            $orderItem->total = $item->price * $item->qty;
+            $orderItem->save();
+
+            //Update product stock
+
+            $productData = Product::find($item->id);
+            if ($productData->track_qty == 'Yes') {
+                $currentQty = $productData->qty;
+                $updatedQty = $currentQty - $item->qty;
+                $productData->qty = $updatedQty;
+                $productData->save();
+            }
         }
+
+        //Send Order Email
+        orderEmail($order->id, 'customer');
+
+        session()->flash('success', 'You have successfully placed your order');
+
+        Cart::destroy();
+
+        session()->forget('code');
+
+        return response()->json([
+            'message' => 'Order placed successfully',
+            'orderId' => $order->id,
+            'status' => true,
+        ]);
+    }else {
+        # code...
     }
+}
 
     public function thankyou($id)
     {

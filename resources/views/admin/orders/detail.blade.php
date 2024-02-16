@@ -42,8 +42,6 @@
                                 </div>
 
                                 <div class="col-sm-4 invoice-col">
-                                    {{-- <b>Invoice #007612</b><br> --}}
-                                    {{-- <br> --}}
                                     <b>Order ID:</b> {{ $order->id }}<br>
                                     <b>Total:</b> ${{ number_format($order->grand_total, 2) }}<br>
                                     <b>Status:</b>
@@ -57,6 +55,7 @@
                                         <span class="text-danger">Cancelled</span>
                                     @endif
                                     <br>
+                                    <b>Payment Method: </b> {{ $order->payment_method }}
                                 </div>
                             </div>
                         </div>
@@ -132,6 +131,24 @@
                             </div>
                         </form>
                     </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <form action="" method="post" name="paymentStatus" id="paymentStatus">
+                                <h2 class="h4 mb-3">Payment Status</h2>
+                                <div class="mb-3">
+                                    <select name="paymentStatus" id="paymentStatus" class="form-control">
+                                        <option value="unpaid" {{ $order->payment_status == 'unpaid' ? 'selected' : '' }}>Not Paid</option>
+                                        <option value="paid" {{ $order->payment_status == 'paid' ? 'selected' : '' }}>Paid</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <button class="btn btn-primary">Update</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <div class="card">
                         <div class="card-body">
                             <form action="" method="post" name="sendInvoiceEmail" id="sendInvoiceEmail">
@@ -149,6 +166,8 @@
                         </div>
                     </div>
                 </div>
+
+
             </div>
         </div>
         <!-- /.card -->
@@ -160,7 +179,6 @@
     <script>
         $(document).ready(function() {
             $('#shipped_date').datetimepicker({
-                // options here
                 format: 'Y-m-d H:i:s',
             });
         });
@@ -169,16 +187,31 @@
             event.preventDefault();
             if (confirm("Are you sure you want to change status?")) {
 
-            $.ajax({
-                url: '{{ route('orders.changeOrderStatus', $order->id) }}',
-                type: 'post',
-                data: $(this).serializeArray(),
-                dataType: 'json',
-                success: function(response) {
-                    window.location.href = '{{ route('orders.detail', $order->id) }}';
-                }
-            });
-        }
+                $.ajax({
+                    url: '{{ route('orders.changeOrderStatus', $order->id) }}',
+                    type: 'post',
+                    data: $(this).serializeArray(),
+                    dataType: 'json',
+                    success: function(response) {
+                        window.location.href = '{{ route('orders.detail', $order->id) }}';
+                    }
+                });
+            }
+        });
+
+        $("#paymentStatus").submit(function(event) {
+            event.preventDefault();
+            if (confirm("Are you sure you want to change payment status?")) {
+                $.ajax({
+                    url: '{{ route('orders.changePaymentStatus', $order->id) }}',
+                    type: 'post',
+                    data: $(this).serializeArray(),
+                    dataType: 'json',
+                    success: function(response) {
+                        window.location.href = '{{ route('orders.detail', $order->id) }}';
+                    }
+                });
+            }
         });
 
         $("#sendInvoiceEmail").submit(function(event) {

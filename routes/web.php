@@ -164,6 +164,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/orders/{id}', [OrderController::class, 'detail'])->name('orders.detail');
         Route::post('/order/change-status/{id}', [OrderController::class, 'changeOrderStatus'])->name('orders.changeOrderStatus');
         Route::post('/order/send-email/{id}', [OrderController::class, 'sendInvoiceEmail'])->name('orders.sendInvoiceEmail');
+        Route::post('/order/change-payment-status/{id}', [OrderController::class, 'changePaymentStatus'])->name('orders.changePaymentStatus');
 
         //User Routes
         Route::get('/users', [UserController::class, 'index'])->name('users.index');

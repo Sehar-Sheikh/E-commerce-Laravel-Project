@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
-use PHPUnit\Framework\MockObject\ReturnValueNotConfiguredException;
 
 class OrderController extends Controller
 {
@@ -54,6 +54,41 @@ class OrderController extends Controller
             'message' => $message
         ]);
     }
+
+
+    // use App\Models\PaymentMethod;
+
+public function changePaymentStatus(Request $request, $id)
+{
+    $order = Order::find($id);
+
+    if (!$order) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Order not found'
+        ], 404);
+    }
+
+    $order->payment_status = $request->paymentStatus;
+    $order->save();
+
+    // Update payment_status in the payment_methods table
+    $paymentMethod = PaymentMethod::where('order_id', $order->id)->first();
+
+    if ($paymentMethod) {
+        $paymentMethod->payment_status = $request->paymentStatus;
+        $paymentMethod->save();
+    }
+
+    $message = 'Payment status updated successfully.';
+    session()->flash('success', $message);
+
+    return response()->json(['status' => true, 'message' => $message]);
+}
+
+
+
+
 
     public function sendInvoiceEmail(Request $request, $orderId)
     {

@@ -51,6 +51,7 @@
                                 <th>Status</th>
                                 <th>Amount</th>
                                 <th>Date Purchased</th>
+                                <th>Payment Status</th>
 
                             </tr>
                         </thead>
@@ -75,6 +76,13 @@
                                         </td>
                                         <td>${{ number_format($order->grand_total, 2) }}</td>
                                         <td>{{ \Carbon\Carbon::parse($order->created_at)->format('d M,Y') }}</td>
+                                        <td>
+                                            @if ($order->payment_status == 'paid')
+                                                <span class="badge bg-success">Paid</span>
+                                            @else
+                                            <span class="badge bg-danger">Unpaid</span>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             @else

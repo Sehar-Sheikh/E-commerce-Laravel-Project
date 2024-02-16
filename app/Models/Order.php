@@ -15,4 +15,8 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function paymentMethod()
+    {
+        return $this->hasOne(PaymentMethod::class);
+    }
 }

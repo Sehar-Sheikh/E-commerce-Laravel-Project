@@ -181,6 +181,8 @@
                             @endif
                         </div>
 
+                        <div id="card-element"></div>
+                        <div id="card-errors" role="alert"></div>
                         <div class="card payment-form ">
                             <h3 class="card-title h5 mb-3">Payment Method</h3>
                             <div class="">
@@ -207,8 +209,8 @@
                                             class="form-control">
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="expiry_date" class="mb-2">CVV Code</label>
-                                        <input type="text" name="expiry_date" id="expiry_date" placeholder="123"
+                                        <label for="cvv" class="mb-2">CVV Code</label>
+                                        <input type="text" name="cvv" id="cvv" placeholder="123"
                                             class="form-control">
                                     </div>
                                 </div>
@@ -238,6 +240,7 @@
                 $("#card-payment-form").removeClass('d-none');
             }
         });
+
 
         $("#orderForm").submit(function(event) {
             event.preventDefault();
@@ -384,14 +387,15 @@
                         $("#grandTotal").html('$' + response.grandTotal);
                         $("#discount_value").html('$' + response.discount);
                         $("#discount-response-wrapper").html(response.discountString);
-                    }else{
-                        $("#discount-response-wrapper").html("<span class='text-danger'>"+response.message+"</span>");
+                    } else {
+                        $("#discount-response-wrapper").html("<span class='text-danger'>" + response
+                            .message + "</span>");
                     }
                 }
             });
         });
 
-        $('body').on('click',"#remove-discount", function(){
+        $('body').on('click', "#remove-discount", function() {
             $.ajax({
                 url: '{{ route('front.removeCoupon') }}',
                 type: 'post',

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b2c9d641217299979ce12208a012f8bd",
+    "content-hash": "340e2e7910f251eab1fb46a411b09ca9",
     "packages": [
         {
             "name": "brick/math",
@@ -3602,6 +3602,7 @@
             ],
             "time": "2023-11-08T05:53:05+00:00"
         },
+
         {
             "name": "symfony/console",
             "version": "v6.4.2",

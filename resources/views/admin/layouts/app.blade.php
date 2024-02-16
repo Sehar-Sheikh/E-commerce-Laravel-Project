@@ -19,8 +19,6 @@
 
     <link rel="stylesheet" href="{{ asset('admin-assets/plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('admin-assets/css/datetimepicker.css') }}">
-
-
     <link rel="stylesheet" href="{{ asset('admin-assets/css/custom.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
@@ -38,9 +36,6 @@
                 </li>
             </ul>
             <div class="navbar-nav pl-2">
-                <!-- <ol class="breadcrumb p-0 m-0 bg-white">
-      <li class="breadcrumb-item active">Dashboard</li>
-     </ol> -->
             </div>
 
             <ul class="navbar-nav ml-auto">
@@ -99,6 +94,8 @@
     <script src="{{ asset('admin-assets/plugins/summernote/summernote.min.js') }}"></script>
     <script src="{{ asset('admin-assets/plugins/select2/js/select2.min.js') }}"></script>
     <script src="{{ asset('admin-assets/js/datetimepicker.js') }}"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
 
     <!-- AdminLTE for demo purposes -->
     <script src="{{ asset('admin-assets/js/demo.js') }}"></script>
@@ -110,9 +107,9 @@
             }
         });
 
-        $(document).ready(function(){
+        $(document).ready(function() {
             $(".summernote").summernote({
-                height:200
+                height: 200
             });
         });
     </script>
