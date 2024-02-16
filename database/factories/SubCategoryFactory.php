@@ -20,6 +20,7 @@ class SubCategoryFactory extends Factory
             'name' => $this->faker->name,
             'status' => $this->faker->randomElement([0, 1]),
             'slug' => $this->faker->name,
+            'category_id' => $this->faker->randomElement([1, 30])
         ];
     }
 }
