@@ -4,13 +4,17 @@
         <div class="container">
             <div class="light-font">
                 <ol class="breadcrumb primary-color mb-0">
-                    <li class="breadcrumb-item"><a class="white-text" href="#">Home</a></li>
-                    <li class="breadcrumb-item"><a class="white-text" href="#">Shop</a></li>
+                    <li class="breadcrumb-item"><a class="white-text" href="{{ route('front.home') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a class="white-text" href="{{ route('front.shop') }}">Shop</a></li>
                     <li class="breadcrumb-item">Checkout</li>
                 </ol>
             </div>
         </div>
     </section>
+
+    <?php
+    $user = Auth::user();
+    ?>
 
     <section class="section-9 pt-4">
         <div class="container">
@@ -181,9 +185,10 @@
                             @endif
                         </div>
 
-                        <div id="card-element"></div>
-                        <div id="card-errors" role="alert"></div>
-                        <div class="card payment-form ">
+
+                        <!-- CREDIT CARD FORM STARTS HERE -->
+
+                        <div class="card payment-form">
                             <h3 class="card-title h5 mb-3">Payment Method</h3>
                             <div class="">
                                 <input checked type="radio" name="payment_method" id="payment_method_one"
@@ -195,28 +200,12 @@
                                 <input type="radio" name="payment_method" id="payment_method_two" value="stripe">
                                 <label for="payment_method_two" class="form-check-label">Stripe</label>
                             </div>
-
-                            <div class="card-body p-0 d-none mt-3" id="card-payment-form">
-                                <div class="mb-3">
-                                    <label for="card_number" class="mb-2">Card Number</label>
-                                    <input type="text" name="card_number" id="card_number"
-                                        placeholder="Valid Card Number" class="form-control">
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label for="expiry_date" class="mb-2">Expiry Date</label>
-                                        <input type="text" name="expiry_date" id="expiry_date" placeholder="MM/YYYY"
-                                            class="form-control">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="cvv" class="mb-2">CVV Code</label>
-                                        <input type="text" name="cvv" id="cvv" placeholder="123"
-                                            class="form-control">
-                                    </div>
-                                </div>
-                            </div>
                             <div class="pt-4">
-                                <button class="btn-dark btn btn-block w-100" type="submit">Pay now</button>
+                                <button id="payNowButton" class="btn-dark btn btn-block w-100" type="submit">Pay
+                                    now</button>
+                                <button id="proceedToStripeButton" onclick="proceedToStripe()"
+                                    class="btn-dark btn btn-block w-100">Proceed to Payment</button>
+
                             </div>
                         </div>
                         <!-- CREDIT CARD FORM ENDS HERE -->
@@ -229,25 +218,43 @@
 
 @section('customJs')
     <script>
-        $("#payment_method_one").click(function() {
-            if ($(this).is(":checked") == true) {
-                $("#card-payment-form").addClass('d-none');
+        $(document).ready(function() {
+            function updateButtonVisibility() {
+                if ($('#payment_method_one').is(':checked')) {
+                    $('#payNowButton').show();
+                    $('#proceedToStripeButton').hide();
+                } else if ($('#payment_method_two').is(':checked')) {
+                    $('#payNowButton').hide();
+                    $('#proceedToStripeButton').show();
+                }
             }
+
+            updateButtonVisibility();
+
+            $('input[name="payment_method"]').change(function() {
+                updateButtonVisibility();
+            });
         });
 
-        $("#payment_method_two").click(function() {
-            if ($(this).is(":checked") == true) {
-                $("#card-payment-form").removeClass('d-none');
-            }
-        });
-
+        function proceedToStripe() {
+            var grandTotal = '{{ $grandTotal }}';
+            window.location.href = '{{ route('front.stripe') }}?grand_total=' + grandTotal;
+        }
 
         $("#orderForm").submit(function(event) {
             event.preventDefault();
+            var paymentMethod = $('input[name="payment_method"]:checked').val();
+            var url;
+
+            if (paymentMethod === 'cod') {
+                url = '{{ route('front.processCheckout') }}';
+            } else if (paymentMethod === 'stripe') {
+                url = '{{ route('front.stripe') }}';
+            }
 
             $('button[type="submit"]').prop('disabled', true);
             $.ajax({
-                url: '{{ route('front.processCheckout') }}',
+                url: url,
                 type: 'post',
                 data: $(this).serializeArray(),
                 dataType: 'json',
@@ -347,9 +354,12 @@
                                 .html('');
                         }
                     } else {
-                        window.location.href = "{{ url('thanks/') }}/" + response.orderId;
+                        if (paymentMethod === 'cod') {
+                            window.location.href = "{{ url('thanks/') }}/" + response.orderId;
+                        } else if (paymentMethod === 'stripe') {
+                            window.location.href = ("{{ route('front.stripe') }}");
+                        }
                     }
-
                 }
             });
         });
@@ -388,7 +398,8 @@
                         $("#discount_value").html('$' + response.discount);
                         $("#discount-response-wrapper").html(response.discountString);
                     } else {
-                        $("#discount-response-wrapper").html("<span class='text-danger'>" + response
+                        $("#discount-response-wrapper").html("<span class='text-danger'>" +
+                            response
                             .message + "</span>");
                     }
                 }

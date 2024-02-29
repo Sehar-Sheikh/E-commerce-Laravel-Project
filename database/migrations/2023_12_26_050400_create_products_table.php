@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('slug');
-            $table->string('description')->nullable();
+            $table->text('description');
+            $table->text('short_description')->nullable();
+            $table->text('shipping_returns')->nullable();
+            $table->text('related_products')->nullable();
             $table->double('price',10,2);
             $table->double('compare_price',10,2)->nullable();
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
@@ -28,6 +31,7 @@ return new class extends Migration
             $table->integer('qty')->nullable();
             $table->integer('status')->default(1);
             $table->timestamps();
+
         });
     }
 

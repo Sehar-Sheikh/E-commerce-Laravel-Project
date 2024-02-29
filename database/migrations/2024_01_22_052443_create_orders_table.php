@@ -20,6 +20,10 @@ return new class extends Migration
             $table->integer('coupon_code_id')->nullable();
             $table->double('discount',10,2)->nullable();
             $table->double('grand_total',10,2);
+            $table->enum('payment_method',['cod','stripe'])->default('cod');
+            $table->enum('payment_status',['paid','unpaid'])->default('unpaid');
+            $table->enum('status',['pending','shipped','delivered','cancelled'])->default('pending');
+            $table->timestamp('shipped_date')->nullable();
 
             //User addresses related columns
             $table->string('first_name');

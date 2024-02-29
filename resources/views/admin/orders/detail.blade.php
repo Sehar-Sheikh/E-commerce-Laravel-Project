@@ -45,6 +45,7 @@
                                     <b>Order ID:</b> {{ $order->id }}<br>
                                     <b>Total:</b> ${{ number_format($order->grand_total, 2) }}<br>
                                     <b>Status:</b>
+                                    <strong>
                                     @if ($order->status == 'pending')
                                         <span class="text-warning">Pending</span>
                                     @elseif ($order->status == 'shipped')
@@ -54,8 +55,12 @@
                                     @else
                                         <span class="text-danger">Cancelled</span>
                                     @endif
+                                </strong>
                                     <br>
-                                    <b>Payment Method: </b> {{ $order->payment_method }}
+                                    <b>Payment Method: </b>
+                                    <span class="text-success">
+                                        <strong>{{ $order->payment_method }}</strong>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -138,8 +143,10 @@
                                 <h2 class="h4 mb-3">Payment Status</h2>
                                 <div class="mb-3">
                                     <select name="paymentStatus" id="paymentStatus" class="form-control">
-                                        <option value="unpaid" {{ $order->payment_status == 'unpaid' ? 'selected' : '' }}>Not Paid</option>
-                                        <option value="paid" {{ $order->payment_status == 'paid' ? 'selected' : '' }}>Paid</option>
+                                        <option value="unpaid" {{ $order->payment_status == 'unpaid' ? 'selected' : '' }}>
+                                            Not Paid</option>
+                                        <option value="paid" {{ $order->payment_status == 'paid' ? 'selected' : '' }}>
+                                            Paid</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">

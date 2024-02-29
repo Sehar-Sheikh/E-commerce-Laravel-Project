@@ -13,13 +13,11 @@
                 </div>
             </div>
         </div>
-        <!-- /.container-fluid -->
     </section>
-    <!-- Main content -->
     <section class="content">
-        <!-- Default box -->
         <div class="container-fluid">
-            <form action="" method="POST" id="userForm" name="userForm">
+            <form action="{{ route('users.store') }}" method="POST" id="userForm" name="userForm">
+                @csrf
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
@@ -66,6 +64,19 @@
                                     <p></p>
                                 </div>
                             </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="roles">Roles</label><br>
+                                    <select class="form-control select2" multiple="multiple" id="select2"
+                                        data-placeholder="Select Roles" name="roles[]">
+                                        @foreach ($roles as $role)
+                                            <option value="{{ $role->id }}">{{ ucfirst($role->name) }}</option>
+                                        @endforeach
+                                    </select>
+                                    <p></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -82,6 +93,10 @@
 
 @section('customJS')
     <script>
+        $(function() {
+            $('#select2').select2();
+        });
+
         $("#userForm").submit(function(event) {
             event.preventDefault();
             var element = $(this);

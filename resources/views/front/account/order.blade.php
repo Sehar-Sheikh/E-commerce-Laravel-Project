@@ -31,6 +31,7 @@
                                             <th>Orders #</th>
                                             <th>Date Purchased</th>
                                             <th>Status</th>
+                                            <th>Shipped date</th>
                                             <th>Total</th>
                                         </tr>
                                     </thead>
@@ -54,6 +55,14 @@
                                                         @else
                                                             <span class="badge bg-danger">Cancelled</span>
                                                         @endif
+                                                    </td>
+                                                    <td>
+                                                        @if ($order->status == 'shipped' || $order->status == 'delivered')
+                                                            {{ \Carbon\Carbon::parse($order->shipped_date)->format('d M, Y') }}
+                                                        @else
+                                                            N/A
+                                                        @endif
+
                                                     </td>
                                                     <td>${{ number_format($order->grand_total, 2) }}</td>
                                                 </tr>

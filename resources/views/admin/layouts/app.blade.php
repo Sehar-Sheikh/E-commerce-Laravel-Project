@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('admin-assets/css/datetimepicker.css') }}">
     <link rel="stylesheet" href="{{ asset('admin-assets/css/custom.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -74,6 +75,7 @@
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             @yield('content')
+            @include('sweetalert::alert')
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
@@ -95,12 +97,15 @@
     <script src="{{ asset('admin-assets/plugins/select2/js/select2.min.js') }}"></script>
     <script src="{{ asset('admin-assets/js/datetimepicker.js') }}"></script>
     <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
 
 
     <!-- AdminLTE for demo purposes -->
     <script src="{{ asset('admin-assets/js/demo.js') }}"></script>
 
     <script type="text/javascript">
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

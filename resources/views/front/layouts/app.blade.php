@@ -37,6 +37,8 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/slick-theme.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/ion.rangeSlider.min.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/style.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/custom.css') }}" />
+
 
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -81,7 +83,7 @@
                             <a href="#" data-toggle="dropdown" class="nav-icon pe-md-0">
                                 <div class="image-avator d-flex justify-content-end"
                                     style="height: 50px;width: 50px; border-radius: 50%; margin-left:15px;">
-                                    <img src="{{ asset('admin-assets/img/avatar5.png') }}" class="avatar img-fluid"
+                                    <img src="{{ asset('admin-assets/img/user.png') }}" class="avatar img-fluid"
                                         style="border-radius: inherit;" alt="">
                                 </div>
                             </a>
@@ -228,19 +230,10 @@
         </div>
     </div>
 
-
-    {{-- <script src="{{ asset('front-assets/js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('front-assets/js/bootstrap.bundle.5.1.3.min.js') }}"></script>
-    <script src="{{ asset('front-assets/js/instantpages.5.1.0.min.js') }}"></script>
-
-    <script src="{{ asset('front-assets/js/lazyload.17.6.0.min.js') }}"></script>
-    <script src="{{ asset('front-assets/js/slick.min.js') }}"></script>
-    <script src="{{ asset('front-assets/js/ion.rangeSlider.min.js') }}"></script>
-    <script src="{{ asset('front-assets/js/custom.js') }}"></script> --}}
-
     <!-- jQuery -->
     <script src="{{ asset('front-assets/js/jquery-3.6.0.min.js') }}"></script>
     <!-- Bootstrap JS -->
+    <script src="{{ asset('front-assets/js/bootstrap.bundle.5.1.3.min.js') }}"></script>
     <script src="{{ asset('admin-assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- Your Custom Scripts -->
     <script src="{{ asset('front-assets/js/instantpages.5.1.0.min.js') }}"></script>
@@ -248,6 +241,7 @@
     <script src="{{ asset('front-assets/js/slick.min.js') }}"></script>
     <script src="{{ asset('front-assets/js/ion.rangeSlider.min.js') }}"></script>
     <script src="{{ asset('front-assets/js/custom.js') }}"></script>
+    <script src="https://js.stripe.com/v3/"></script>
 
 
     <script>
