@@ -83,7 +83,7 @@
                             <a href="#" data-toggle="dropdown" class="nav-icon pe-md-0">
                                 <div class="image-avator d-flex justify-content-end"
                                     style="height: 50px;width: 50px; border-radius: 50%; margin-left:15px;">
-                                    <img src="{{ asset('admin-assets/img/user.png') }}" class="avatar img-fluid"
+                                    <img src="{{ asset('front-assets/images/user.png') }}" class="avatar img-fluid"
                                         style="border-radius: inherit;" alt="">
                                 </div>
                             </a>

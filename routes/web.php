@@ -50,8 +50,9 @@ Route::post('/update-cart', [CartController::class, 'updateCart'])->name('front.
 Route::post('/delete-item', [CartController::class, 'deleteItem'])->name('front.deleteItem.cart');
 Route::get('/checkout', [CartController::class, 'checkout'])->name('front.checkout');
 Route::post('/process-checkout', [CartController::class, 'processCheckout'])->name('front.processCheckout');
-Route::match(['get', 'post'], '/stripe', [CartController::class, 'stripe'])->name('front.stripe');
 Route::get('/thanks/{orderId}', [CartController::class, 'thankyou'])->name('front.thankyou');
+// Route::get('thanks/{method}/{orderId}', [CartController::class, 'thankyou'])->name('front.thankyou');
+
 
 
 Route::post('/get-order-summery', [CartController::class, 'getOrderSummery'])->name('front.getOrderSummery');
@@ -95,12 +96,13 @@ Route::group(['prefix' => 'account'], function () {
 
 //Admin Routes
 Route::group(['prefix' => 'admin'], function () {
-    Route::group(['middleware' => 'admin.guest'], function () {
-
         Route::get('/login', [AdminLoginController::class, 'index'])->name('admin.login');
         Route::post('/authenticate', [AdminLoginController::class, 'authenticate'])->name('admin.authenticate');
-    });
 
+    // Route::group(['middleware' => ['admin.guest', 'permission']], function () {
+
+    //     Route::get('/login', [AdminLoginController::class, 'index'])->name('admin.login');
+    // });
 
     Route::group(['middleware' => 'admin.auth'], function () {
 
@@ -113,6 +115,14 @@ Route::group(['prefix' => 'admin'], function () {
             Route::resource('permissions', PermissionsController::class);
             Route::resource('roles', RolesController::class);
         });
+
+        //User Routes
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.delete');
 
         //Category Routes
         Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
@@ -178,13 +188,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/order/send-email/{id}', [OrderController::class, 'sendInvoiceEmail'])->name('orders.sendInvoiceEmail');
         Route::post('/order/change-payment-status/{id}', [OrderController::class, 'changePaymentStatus'])->name('orders.changePaymentStatus');
 
-        //User Routes
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
-        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-        Route::post('/users', [UserController::class, 'store'])->name('users.store');
-        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.delete');
 
         //Page Routes
         Route::get('/pages', [PageController::class, 'index'])->name('pages.index');

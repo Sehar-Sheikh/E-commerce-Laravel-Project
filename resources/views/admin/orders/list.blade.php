@@ -50,6 +50,7 @@
                                 <th>Phone</th>
                                 <th>Status</th>
                                 <th>Amount</th>
+                                <th>Payment Method</th>
                                 <th>Date Purchased</th>
                                 <th>Payment Status</th>
 
@@ -75,12 +76,20 @@
                                             @endif
                                         </td>
                                         <td>${{ number_format($order->grand_total, 2) }}</td>
+                                        <td class="text-center">
+                                            @if ($order->payment_method == 'cod')
+                                                <span class="badge bg-primary">COD</span>
+                                            @else
+                                                <span class="badge bg-secondary">STRIPE</span>
+                                            @endif
+                                        </td>
+
                                         <td>{{ \Carbon\Carbon::parse($order->created_at)->format('d M,Y') }}</td>
                                         <td>
                                             @if ($order->payment_status == 'paid')
                                                 <span class="badge bg-success">Paid</span>
                                             @else
-                                            <span class="badge bg-danger">Unpaid</span>
+                                                <span class="badge bg-danger">Unpaid</span>
                                             @endif
                                         </td>
                                     </tr>

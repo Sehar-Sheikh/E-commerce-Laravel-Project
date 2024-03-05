@@ -12,13 +12,10 @@
         </div>
     </section>
 
-    <?php
-    $user = Auth::user();
-    ?>
-
     <section class="section-9 pt-4">
         <div class="container">
-            <form id="orderForm" name="orderForm" action="" method="POST">
+            <form id="orderForm" name="orderForm" action="{{ route('front.processCheckout') }}" method="POST">
+                @csrf
                 <div class="row">
                     <div class="col-md-8">
                         <div class="sub-title">
@@ -185,10 +182,7 @@
                             @endif
                         </div>
 
-
-                        <!-- CREDIT CARD FORM STARTS HERE -->
-
-                        <div class="card payment-form">
+                        <div class="card payment-form ">
                             <h3 class="card-title h5 mb-3">Payment Method</h3>
                             <div class="">
                                 <input checked type="radio" name="payment_method" id="payment_method_one"
@@ -200,16 +194,20 @@
                                 <input type="radio" name="payment_method" id="payment_method_two" value="stripe">
                                 <label for="payment_method_two" class="form-check-label">Stripe</label>
                             </div>
-                            <div class="pt-4">
-                                <button id="payNowButton" class="btn-dark btn btn-block w-100" type="submit">Pay
-                                    now</button>
-                                <button id="proceedToStripeButton" onclick="proceedToStripe()"
-                                    class="btn-dark btn btn-block w-100">Proceed to Payment</button>
+
+                            <div class="card-body p-0 d-none mt-3" id="card-payment-form">
+                                <b>Card Number</b>
+                                <div id="card-element" class="form-control"></div>
+                                <div id="card-errors" role="alert" class="m-2"></div>
 
                             </div>
                         </div>
-                        <!-- CREDIT CARD FORM ENDS HERE -->
+
+                        <div class="pt-4">
+                            <button class="btn-dark btn btn-block w-100" type="submit">Pay now</button>
+                        </div>
                     </div>
+                    <!-- CREDIT CARD FORM ENDS HERE -->
                 </div>
             </form>
         </div>
@@ -218,148 +216,200 @@
 
 @section('customJs')
     <script>
-        $(document).ready(function() {
-            function updateButtonVisibility() {
-                if ($('#payment_method_one').is(':checked')) {
-                    $('#payNowButton').show();
-                    $('#proceedToStripeButton').hide();
-                } else if ($('#payment_method_two').is(':checked')) {
-                    $('#payNowButton').hide();
-                    $('#proceedToStripeButton').show();
-                }
+        $("#payment_method_one").click(function() {
+            if ($(this).is(":checked") == true) {
+                $("#card-payment-form").addClass('d-none');
             }
-
-            updateButtonVisibility();
-
-            $('input[name="payment_method"]').change(function() {
-                updateButtonVisibility();
-            });
         });
 
-        function proceedToStripe() {
-            var grandTotal = '{{ $grandTotal }}';
-            window.location.href = '{{ route('front.stripe') }}?grand_total=' + grandTotal;
-        }
-
-        $("#orderForm").submit(function(event) {
-            event.preventDefault();
-            var paymentMethod = $('input[name="payment_method"]:checked').val();
-            var url;
-
-            if (paymentMethod === 'cod') {
-                url = '{{ route('front.processCheckout') }}';
-            } else if (paymentMethod === 'stripe') {
-                url = '{{ route('front.stripe') }}';
+        $("#payment_method_two").click(function() {
+            if ($(this).is(":checked") == true) {
+                $("#card-payment-form").removeClass('d-none');
             }
+        });
 
+        // Create a Stripe client.
+        var stripe = Stripe(
+            "pk_test_51OgRRpBEY16pz2drPI2JlDjK2e34M3pGcgl1g3nhJhrD9P5sq5h8jPEf9mLOxW7BRYjeaH3BcmQrvKQNElG1ScGY00ihwdSCKc"
+        );
+
+        // Create an instance of Elements.
+        var elements = stripe.elements();
+
+        // Custom styling can be passed to options when creating an Element.
+        var style = {
+            base: {
+                color: '#32325d',
+                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                fontSmoothing: 'antialiased',
+                fontSize: '16px',
+                '::placeholder': {
+                    color: '#aab7c4'
+                }
+            },
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
+            }
+        };
+
+        // Create an instance of the card Element.
+        var card = elements.create('card', {
+            style: style
+        });
+
+        // Add an instance of the card Element into the card-element <div>.
+        card.mount('#card-element');
+
+        // Handle real-time validation errors from the card Element.
+        card.on('change', function(event) {
+            var displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+
+        // Handle form submission.
+        var form = document.getElementById('orderForm');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Disable submit button to prevent double submission
             $('button[type="submit"]').prop('disabled', true);
-            $.ajax({
-                url: url,
-                type: 'post',
-                data: $(this).serializeArray(),
-                dataType: 'json',
-                success: function(response) {
-                    var errors = response.errors;
 
+            // Use the serializeArray function to gather form data
+            var formData = $(this).serializeArray();
+
+            // Perform Stripe token creation
+            stripe.createToken(card).then(function(result) {
+                console.log(result);
+
+                if (result.error) {
+                    var errorElement = document.getElementById("card-errors");
+                    errorElement.textContent = result.error.message;
+
+                    // Re-enable submit button on error
                     $('button[type="submit"]').prop('disabled', false);
+                } else {
+                    // Add the Stripe token to the form data
+                    formData.push({
+                        name: 'stripeToken',
+                        value: result.token.id
+                    });
 
-                    if (response.status == false) {
-                        if (errors.first_name) {
-                            $("#first_name").addClass('is-invalid')
-                                .siblings("p").addClass('invalid-feedback')
-                                .html(errors.first_name);
-                        } else {
-                            $("#first_name").removeClass('is-invalid')
-                                .siblings("p").removeClass('invalid-feedback')
-                                .html('');
-                        }
+                    // Make the AJAX request
+                    $.ajax({
+                        url: '{{ route('front.processCheckout') }}',
+                        type: 'post',
+                        data: formData,
+                        dataType: 'json',
+                        success: function(response) {
+                            var errors = response.errors;
 
-                        if (errors.last_name) {
-                            $("#last_name").addClass('is-invalid')
-                                .siblings("p").addClass('invalid-feedback')
-                                .html(errors.last_name);
-                        } else {
-                            $("#last_name").removeClass('is-invalid')
-                                .siblings("p").removeClass('invalid-feedback')
-                                .html('');
-                        }
+                            // Re-enable submit button after AJAX request
+                            $('button[type="submit"]').prop('disabled', false);
 
-                        if (errors.email) {
-                            $("#email").addClass('is-invalid')
-                                .siblings("p").addClass('invalid-feedback')
-                                .html(errors.email);
-                        } else {
-                            $("#email").removeClass('is-invalid')
-                                .siblings("p").removeClass('invalid-feedback')
-                                .html('');
-                        }
+                            if (response.status == false) {
+                                if (errors.first_name) {
+                                    $("#first_name").addClass('is-invalid')
+                                        .siblings("p").addClass('invalid-feedback')
+                                        .html(errors.first_name);
+                                } else {
+                                    $("#first_name").removeClass('is-invalid')
+                                        .siblings("p").removeClass('invalid-feedback')
+                                        .html('');
+                                }
 
-                        if (errors.country) {
-                            $("#country").addClass('is-invalid')
-                                .siblings("p").addClass('invalid-feedback')
-                                .html(errors.country);
-                        } else {
-                            $("#country").removeClass('is-invalid')
-                                .siblings("p").removeClass('invalid-feedback')
-                                .html('');
-                        }
+                                if (errors.last_name) {
+                                    $("#last_name").addClass('is-invalid')
+                                        .siblings("p").addClass('invalid-feedback')
+                                        .html(errors.last_name);
+                                } else {
+                                    $("#last_name").removeClass('is-invalid')
+                                        .siblings("p").removeClass('invalid-feedback')
+                                        .html('');
+                                }
 
-                        if (errors.address) {
-                            $("#address").addClass('is-invalid')
-                                .siblings("p").addClass('invalid-feedback')
-                                .html(errors.address);
-                        } else {
-                            $("#address").removeClass('is-invalid')
-                                .siblings("p").removeClass('invalid-feedback')
-                                .html('');
-                        }
+                                if (errors.email) {
+                                    $("#email").addClass('is-invalid')
+                                        .siblings("p").addClass('invalid-feedback')
+                                        .html(errors.email);
+                                } else {
+                                    $("#email").removeClass('is-invalid')
+                                        .siblings("p").removeClass('invalid-feedback')
+                                        .html('');
+                                }
 
-                        if (errors.city) {
-                            $("#city").addClass('is-invalid')
-                                .siblings("p").addClass('invalid-feedback')
-                                .html(errors.city);
-                        } else {
-                            $("#city").removeClass('is-invalid')
-                                .siblings("p").removeClass('invalid-feedback')
-                                .html('');
-                        }
+                                if (errors.country) {
+                                    $("#country").addClass('is-invalid')
+                                        .siblings("p").addClass('invalid-feedback')
+                                        .html(errors.country);
+                                } else {
+                                    $("#country").removeClass('is-invalid')
+                                        .siblings("p").removeClass('invalid-feedback')
+                                        .html('');
+                                }
 
-                        if (errors.state) {
-                            $("#state").addClass('is-invalid')
-                                .siblings("p").addClass('invalid-feedback')
-                                .html(errors.state);
-                        } else {
-                            $("#state").removeClass('is-invalid')
-                                .siblings("p").removeClass('invalid-feedback')
-                                .html('');
-                        }
+                                if (errors.address) {
+                                    $("#address").addClass('is-invalid')
+                                        .siblings("p").addClass('invalid-feedback')
+                                        .html(errors.address);
+                                } else {
+                                    $("#address").removeClass('is-invalid')
+                                        .siblings("p").removeClass('invalid-feedback')
+                                        .html('');
+                                }
 
-                        if (errors.zip) {
-                            $("#zip").addClass('is-invalid')
-                                .siblings("p").addClass('invalid-feedback')
-                                .html(errors.zip);
-                        } else {
-                            $("#zip").removeClass('is-invalid')
-                                .siblings("p").removeClass('invalid-feedback')
-                                .html('');
-                        }
+                                if (errors.city) {
+                                    $("#city").addClass('is-invalid')
+                                        .siblings("p").addClass('invalid-feedback')
+                                        .html(errors.city);
+                                } else {
+                                    $("#city").removeClass('is-invalid')
+                                        .siblings("p").removeClass('invalid-feedback')
+                                        .html('');
+                                }
 
-                        if (errors.mobile) {
-                            $("#mobile").addClass('is-invalid')
-                                .siblings("p").addClass('invalid-feedback')
-                                .html(errors.mobile);
-                        } else {
-                            $("#mobile").removeClass('is-invalid')
-                                .siblings("p").removeClass('invalid-feedback')
-                                .html('');
+                                if (errors.state) {
+                                    $("#state").addClass('is-invalid')
+                                        .siblings("p").addClass('invalid-feedback')
+                                        .html(errors.state);
+                                } else {
+                                    $("#state").removeClass('is-invalid')
+                                        .siblings("p").removeClass('invalid-feedback')
+                                        .html('');
+                                }
+
+                                if (errors.zip) {
+                                    $("#zip").addClass('is-invalid')
+                                        .siblings("p").addClass('invalid-feedback')
+                                        .html(errors.zip);
+                                } else {
+                                    $("#zip").removeClass('is-invalid')
+                                        .siblings("p").removeClass('invalid-feedback')
+                                        .html('');
+                                }
+
+                                if (errors.mobile) {
+                                    $("#mobile").addClass('is-invalid')
+                                        .siblings("p").addClass('invalid-feedback')
+                                        .html(errors.mobile);
+                                } else {
+                                    $("#mobile").removeClass('is-invalid')
+                                        .siblings("p").removeClass('invalid-feedback')
+                                        .html('');
+                                }
+
+                            } else {
+                                // Redirect to the 'thanks' page with the orderId
+                                window.location.href = "{{ url('thanks/') }}/" + response
+                                    .orderId;
+                            }
                         }
-                    } else {
-                        if (paymentMethod === 'cod') {
-                            window.location.href = "{{ url('thanks/') }}/" + response.orderId;
-                        } else if (paymentMethod === 'stripe') {
-                            window.location.href = ("{{ route('front.stripe') }}");
-                        }
-                    }
+                    });
                 }
             });
         });
@@ -398,8 +448,7 @@
                         $("#discount_value").html('$' + response.discount);
                         $("#discount-response-wrapper").html(response.discountString);
                     } else {
-                        $("#discount-response-wrapper").html("<span class='text-danger'>" +
-                            response
+                        $("#discount-response-wrapper").html("<span class='text-danger'>" + response
                             .message + "</span>");
                     }
                 }

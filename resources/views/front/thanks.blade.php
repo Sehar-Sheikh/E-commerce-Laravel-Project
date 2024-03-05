@@ -7,7 +7,7 @@
                     {{ Session::get('success') }}
                 </div>
             @endif
-            <img class="m-4" src="{{ asset('/admin-assets/img/tick.png') }}" style="width:7%" />
+            <img class="m-4" src="{{ asset('/front-assets/images/tick.png') }}" style="width:7%" />
             <h1>
                 Thank you for shopping!
             </h1>

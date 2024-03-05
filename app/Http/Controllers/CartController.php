@@ -14,8 +14,9 @@ use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-
+use Termwind\Components\Raw;
 
 class CartController extends Controller
 {
@@ -239,7 +240,6 @@ class CartController extends Controller
         );
 
         // step-3 : Store data in order table
-
         if ($request->payment_method == 'cod') {
 
             $discountCodeId = NULL;
@@ -325,7 +325,6 @@ class CartController extends Controller
                 $orderItem->save();
 
                 //Update product stock
-
                 $productData = Product::find($item->id);
                 if ($productData->track_qty == 'Yes') {
                     $currentQty = $productData->qty;
@@ -348,113 +347,134 @@ class CartController extends Controller
                 'message' => 'Order placed successfully',
                 'orderId' => $order->id,
                 'status' => true,
+                'method' => 'cod'
+
             ]);
-        } elseif (strtolower($request->payment_method) == 'stripe') { {
+        } elseif ($request->payment_method == 'stripe') {
 
-                // Save order information in the database
-                $discountCodeId = NULL;
-                $promoCode = '';
-                $shipping = 0;
-                $discount = 0;
-                $subTotal = Cart::subtotal(2, '.', '');
+            $discountCodeId = NULL;
+            $promoCode = '';
+            $shipping = 0;
+            $discount = 0;
+            $subTotal = Cart::subtotal(2, '.', '');
 
-                // Apply Discount here
-                if (session()->has('code')) {
-                    $code = session('code');
+            //Apply Discount here
+            if (session()->has('code')) {
+                $code = session('code');
 
-                    if ($code->type == 'percent') {
-                        $discount = ($code->discount_amount / 100) * $subTotal;
-                    } else {
-                        $discount = $code->discount_amount;
-                    }
-                    $discountCodeId = $code->id;
-                    $promoCode = $code->code;
-                }
-
-                // Calculate shipping
-                $shippingInfo = ShippingCharge::where('country_id', $request->country)->first();
-
-                $totalQty = 0;
-                foreach (Cart::content() as $item) {
-                    $totalQty += $item->qty;
-                }
-
-                if ($shippingInfo != null) {
-                    $shipping = $totalQty * $shippingInfo->amount;
-                    $grandTotal = ($subTotal - $discount) + $shipping;
+                if ($code->type == 'percent') {
+                    $discount = ($code->discount_amount / 100) * $subTotal;
                 } else {
-                    $shippingInfo = ShippingCharge::where('country_id', 'rest_of_world')->first();
-                    $shipping = $totalQty * $shippingInfo->amount;
-                    $grandTotal = ($subTotal - $discount) + $shipping;
+                    $discount = $code->discount_amount;
                 }
-
-                $user = Auth::user();
-
-                $order = new Order;
-                $order->subtotal = $subTotal;
-                $order->shipping = $shipping;
-                $order->grand_total = $grandTotal;
-                $order->discount = $discount;
-                $order->coupon_code_id = $discountCodeId;
-                $order->coupon_code = $promoCode;
-                $order->payment_status = 'paid';
-                $order->status = 'pending';
-                $order->user_id = $user->id;
-                $order->first_name = $request->first_name;
-                $order->last_name = $request->last_name;
-                $order->email = $request->email;
-                $order->mobile = $request->mobile;
-                $order->address = $request->address;
-                $order->apartment = $request->apartment;
-                $order->state = $request->state;
-                $order->city = $request->city;
-                $order->zip = $request->zip;
-                $order->notes = $request->order_notes;
-                $order->country_id = $request->country;
-                $order->payment_method = 'stripe';
-                $order->save();
-
-                // Create a record in the payment_methods table
-                $paymentMethod = new PaymentMethod([
-                    'order_id' => $order->id,
-                    'method' => 'stripe',
-                    'payment_status' => 'paid',
-                ]);
-
-                $order->paymentMethod()->save($paymentMethod);
-
-                // Create a record in the order_items table
-                foreach (Cart::content() as $item) {
-                    $orderItem = new OrderItem();
-                    $orderItem->product_id = $item->id;
-                    $orderItem->order_id = $order->id;
-                    $orderItem->name = $item->name;
-                    $orderItem->qty = $item->qty;
-                    $orderItem->price = $item->price;
-                    $orderItem->total = $item->price * $item->qty;
-                    $orderItem->save();
-
-                    // Update product stock
-                    $productData = Product::find($item->id);
-                    if ($productData->track_qty == 'Yes') {
-                        $currentQty = $productData->qty;
-                        $updatedQty = $currentQty - $item->qty;
-                        $productData->qty = $updatedQty;
-                        $productData->save();
-                    }
-                }
-
-                // Send Order Email
-                orderEmail($order->id, 'customer');
-
-                session()->flash('success', 'You have successfully placed your order');
-
-                Cart::destroy();
-
-                session()->forget('code');
-                // Redirect to the 'stripe' function to handle Stripe logic
-                return $this->stripe($request);
+                $discountCodeId = $code->id;
+                $promoCode = $code->code;
             }
+
+            //Calculate shipping
+            $shippingInfo = ShippingCharge::where('country_id', $request->country)->first();
+
+            $totalQty = 0;
+            foreach (Cart::content() as $item) {
+                $totalQty += $item->qty;
+            }
+
+            if ($shippingInfo != null) {
+                $shipping = $totalQty * $shippingInfo->amount;
+                $grandTotal = ($subTotal - $discount) + $shipping;
+            } else {
+                $shippingInfo = ShippingCharge::where('country_id', 'rest_of_world')->first();
+                $shipping = $totalQty * $shippingInfo->amount;
+                $grandTotal = ($subTotal - $discount) + $shipping;
+            }
+
+            //Handle stripe logic
+            if ($request->isMethod('post')) {
+            }
+
+            \Stripe\Stripe::setApiKey('sk_test_51OgRRpBEY16pz2dr7IgUMZu86ZtAUYE3XTkD83HQv6lLRMfGQ6Uu6XSJE8DrzDZmPPHX6ZoYi2h4dtIcMc5neCH600PSdRzd7n');
+
+            $token = $request->input('stripeToken');
+
+            $charge = \Stripe\Charge::create([
+                'amount' => intval(floatval($grandTotal) * 100),
+                'currency' => 'usd',
+                'description' => $user->name,
+                'source' => $token,
+            ]);
+
+            // Step 4: Save Order data after successful payment
+            $order = new Order;
+            $order->subtotal = $subTotal;
+            $order->shipping = $shipping;
+            $order->grand_total = $grandTotal;
+            $order->discount = $discount;
+            $order->coupon_code_id = $discountCodeId;
+            $order->coupon_code = $promoCode;
+            $order->payment_status = 'paid';
+            $order->status = 'pending';
+            $order->user_id = $user->id;
+            $order->first_name = $request->first_name;
+            $order->last_name = $request->last_name;
+            $order->email = $request->email;
+            $order->mobile = $request->mobile;
+            $order->address = $request->address;
+            $order->apartment = $request->apartment;
+            $order->state = $request->state;
+            $order->city = $request->city;
+            $order->zip = $request->zip;
+            $order->notes = $request->order_notes;
+            $order->country_id = $request->country;
+            $order->payment_method = $request->payment_method;
+
+            $order->save();
+
+            // Create a record in the payment_methods table
+            $paymentMethod = new PaymentMethod([
+                'order_id' => $order->id,
+                'method' => 'stripe',
+                'payment_status' => 'paid',
+            ]);
+
+            $order->paymentMethod()->save($paymentMethod);
+
+            // Store order items in order items table
+            foreach (Cart::content() as $item) {
+                $orderItem = new OrderItem();
+                $orderItem->product_id = $item->id;
+                $orderItem->order_id = $order->id;
+                $orderItem->name = $item->name;
+                $orderItem->qty = $item->qty;
+                $orderItem->price = $item->price;
+                $orderItem->total = $item->price * $item->qty;
+                $orderItem->save();
+
+                // Update product stock
+                $productData = Product::find($item->id);
+                if ($productData->track_qty == 'Yes') {
+                    $currentQty = $productData->qty;
+                    $updatedQty = $currentQty - $item->qty;
+                    $productData->qty = $updatedQty;
+                    $productData->save();
+                }
+            }
+
+            // Send Order Email
+            orderEmail($order->id, 'customer');
+
+            session()->flash('success', 'You have successfully placed your order');
+
+            // Clear the cart
+            Cart::destroy();
+
+            // Clear discount session
+            session()->forget('code');
+
+            return response()->json([
+                'message' => 'Order placed successfully',
+                'orderId' => $order->id,
+                'status' => true
+            ]);
         } else {
             // Handle other payment methods or return an error
             return response()->json([
@@ -464,47 +484,13 @@ class CartController extends Controller
         }
     }
 
-    public function stripe(Request $request)
-    {
-        $customerAddress = CustomerAddress::first();
-
-        if ($request->isMethod('post')) {
-            $data = $request->all();
-
-            \Stripe\Stripe::setApiKey('sk_test_51OgRRpBEY16pz2dr7IgUMZu86ZtAUYE3XTkD83HQv6lLRMfGQ6Uu6XSJE8DrzDZmPPHX6ZoYi2h4dtIcMc5neCH600PSdRzd7n');
-
-            $token = $data['stripeToken'];
-
-            try {
-                // Create a charge using Stripe
-                $charge = \Stripe\Charge::create([
-                    'amount' => intval(floatval($data['total_amount']) * 100),
-                    'currency' => 'usd',
-                    'description' => $data['name'],
-                    'source' => $token,
-                ]);
-
-                Cart::destroy();
-
-                // Redirect back with success message
-                return redirect()->back()->with('flash_message_success', 'Your Payment Successfully Done!');
-            } catch (\Stripe\Exception\CardException $e) {
-                // dd($e->getError());
-                return redirect()->back()->with('flash_message_error', $e->getError()->message);
-            } catch (\Exception $e) {
-                // dd($e->getMessage());
-                return redirect()->back()->with('flash_message_error', $e->getMessage());
-            }
-        }
-        return view('front.stripe', ['customerAddress' => $customerAddress]);
-    }
-
     public function thankyou($id)
-    {
-        return view('front.thanks', [
-            'id' => $id
-        ]);
-    }
+{
+    return view('front.thanks',[
+        'id' => $id
+    ]);
+}
+
 
     public function getOrderSummery(Request $request)
     {

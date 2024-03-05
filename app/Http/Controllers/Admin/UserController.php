@@ -18,25 +18,14 @@ class UserController extends Controller
         if ($request->ajax()) {
             return $this->getUsers();
         }
-
-        $users = User::latest();
-
-        if (!empty($request->get('keyWord'))) {
-            $users = $users->where('name', 'like', '%' . $request->get('keyWord') . '%')
-                ->orWhere('email', 'like', '%' . $request->get('keyWord') . '%');
-        }
-
-        $users = $users->paginate(10);
-
-        return view('admin.users.list', [
-            'users' => $users,
-            'roles' => Role::get(),
-        ]);
+        return view('admin.users.list')->with(["roles" => Role::get()]);
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create(Request $request)
     {
-
         $roles = Role::latest()->get();
 
         return view('admin.users.create', [
@@ -44,14 +33,16 @@ class UserController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+
+    public function store(Request $request,User $user)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'password' => 'required|min:5',
-            'email' => 'required|email|unique:users',
-            'phone' => 'required',
-            'status' => 'required|in:1,0',
+            'email' => 'required|email:rfc,dns|unique:users,email,'
         ]);
 
         if ($validator->passes()) {
@@ -80,21 +71,29 @@ class UserController extends Controller
     }
 
 
-    public function edit(Request $request, $id)
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
     {
-        $user = User::find($id);
+        //
+    }
 
-        if ($user == null) {
-            $message = 'User not found.';
-            session()->flash('error', $message);
-            return redirect()->route('admin.users.index');
-        }
-
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(User $user)
+    {
         return view('admin.users.edit', [
-            'user' => $user,
-            'roles' => Role::latest()->get(),
+            "user" => $user,
+            "userRole" => $user->roles->pluck('name')->toArray(),
+            "roles" => Role::latest()->get()
         ]);
     }
+
+    /**
+     * Update the specified resource in storage.
+     */
 
     public function update(Request $request, $id)
     {
@@ -113,8 +112,6 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id . ',id',
-            'phone' => 'required',
-            'status' => 'required|in:1,0',
         ]);
 
         if ($validator->passes()) {
@@ -145,35 +142,20 @@ class UserController extends Controller
         }
     }
 
-    public function destroy($id)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Request $request, User $user)
     {
-        $user = User::find($id);
-
-        if ($user == null) {
-            $message = 'User not found.';
-            session()->flash('error', $message);
-
-            return response()->json([
-                'status' => true,
-                'message' => $message,
-            ]);
+        if ($request->ajax() && $user->delete()) {
+            return response(["message" => "USer Deleted Successfully"], 200);
         }
-
-        $user->delete();
-        $message = 'User deleted successfully.';
-        session()->flash('success', $message);
-
-        return response()->json([
-            'status' => true,
-            'message' => $message,
-        ]);
+        return response(["message" => "User Deletion Failed! Try Again!"], 201);
     }
-
 
     private function getUsers()
     {
         $data = User::with('roles')->get();
-
         return DataTables::of($data)
             ->addColumn('name', function ($row) {
                 return ucfirst($row->name);
@@ -183,25 +165,21 @@ class UserController extends Controller
             })
             ->addColumn('roles', function ($row) {
                 $role = "";
-
                 if ($row->roles != null) {
                     foreach ($row->roles as $next) {
                         $role .= '<span class="badge badge-primary">' . ucfirst($next->name) . '</span> ';
                     }
                 }
-
                 return $role;
             })
             ->addColumn('action', function ($row) {
                 $action = "";
-
+                // if(auth()->user()->hasRole('superuser'))
                 $action .= " <a class='btn btn-xs btn-warning' id='btnEdit' href='" . route('users.edit', $row->id) . "'><i class='fas fa-edit'></i></a>";
-
+                // if(auth()->user()->hasRole('superuser'))
                 $action .= " <button class='btn btn-xs btn-outline-danger' data-id='" . $row->id . "' id='btnDel'><i class='fas fa-trash'></i></button>";
-
                 return $action;
             })
-            ->rawColumns(['name', 'date', 'roles', 'action'])
-            ->make(true);
+            ->rawColumns(['name', 'date', 'roles', 'action'])->make(true);
     }
 }

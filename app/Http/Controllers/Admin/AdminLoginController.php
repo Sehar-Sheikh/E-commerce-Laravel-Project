@@ -27,7 +27,7 @@ class AdminLoginController extends Controller
             $request->password], $request->get('remember'))) {
 
                 $admin = Auth::guard('admin')->user();
-
+                
                 if ($admin->role == 2) {
                     return redirect()->route('admin.dashboard');
                 } else {
