@@ -22,17 +22,16 @@ class AdminLoginController extends Controller
         ]);
 
         if ($validator->passes()) {
+            if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password], $request->get('remember'))) {
+                $admin = auth('admin')->user();
 
-            if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' =>
-            $request->password], $request->get('remember'))) {
-
-                $admin = Auth::guard('admin')->user();
-                
-                if ($admin->role == 2) {
+                // Check if the admin has any roles
+                if ($admin->roles->isNotEmpty()) {
+                    // Redirect to the admin dashboard or any authorized section
                     return redirect()->route('admin.dashboard');
                 } else {
-                    Auth::guard('admin')->logout();
-                    return redirect()->route('admin.login')->with('error', 'You are not authorized to access admin panel.');
+                    auth('admin')->logout();
+                    return redirect()->route('admin.login')->with('error', 'You do not have any roles assigned. Contact the administrator.');
                 }
             } else {
                 return redirect()->route('admin.login')->with('error', 'Either Email/Password is incorrect');

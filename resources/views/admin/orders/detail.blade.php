@@ -46,16 +46,16 @@
                                     <b>Total:</b> ${{ number_format($order->grand_total, 2) }}<br>
                                     <b>Status:</b>
                                     <strong>
-                                    @if ($order->status == 'pending')
-                                        <span class="text-warning">Pending</span>
-                                    @elseif ($order->status == 'shipped')
-                                        <span class="text-info">Shipped</span>
-                                    @elseif ($order->status == 'delivered')
-                                        <span class="text-success">Delivered</span>
-                                    @else
-                                        <span class="text-danger">Cancelled</span>
-                                    @endif
-                                </strong>
+                                        @if ($order->status == 'pending')
+                                            <span class="text-warning">Pending</span>
+                                        @elseif ($order->status == 'shipped')
+                                            <span class="text-info">Shipped</span>
+                                        @elseif ($order->status == 'delivered')
+                                            <span class="text-success">Delivered</span>
+                                        @else
+                                            <span class="text-danger">Cancelled</span>
+                                        @endif
+                                    </strong>
                                     <br>
                                     <b>Payment Method: </b>
                                     <span class="text-success">
@@ -147,6 +147,8 @@
                                             Not Paid</option>
                                         <option value="paid" {{ $order->payment_status == 'paid' ? 'selected' : '' }}>
                                             Paid</option>
+                                        <option value="refund" {{ $order->payment_status == 'refund' ? 'selected' : '' }}>
+                                            Refund</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">

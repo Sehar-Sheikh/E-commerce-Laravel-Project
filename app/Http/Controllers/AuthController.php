@@ -237,6 +237,7 @@ class AuthController extends Controller
     {
         return view('front.account.change-password');
     }
+    
     public function changePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [

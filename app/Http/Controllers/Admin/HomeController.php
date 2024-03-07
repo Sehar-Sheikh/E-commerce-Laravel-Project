@@ -8,7 +8,6 @@ use App\Models\Product;
 use App\Models\TempImage;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
@@ -18,7 +17,7 @@ class HomeController extends Controller
     {
         $totalOrders = Order::where('status', '!=', 'cancelled')->count();
         $totalProducts = Product::count();
-        $totalCustomers = User::where('role', 1)->count();
+        $totalCustomers = User::whereDoesntHave('roles')->count();
         $totalRevenue = Order::where('status', '!=', 'cancelled')->sum('grand_total');
 
         //This month revenue

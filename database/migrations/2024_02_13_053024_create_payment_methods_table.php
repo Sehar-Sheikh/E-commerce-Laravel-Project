@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->enum('method',['cod','stripe'])->default('cod');
-            $table->enum('payment_status',['paid','unpaid'])->default('unpaid');
+            $table->enum('payment_status',['paid','unpaid','refund'])->default('unpaid');
             $table->timestamps();
         });
     }

@@ -88,8 +88,10 @@
                                         <td>
                                             @if ($order->payment_status == 'paid')
                                                 <span class="badge bg-success">Paid</span>
-                                            @else
+                                            @elseif ($order->payment_status == 'unpaid')
                                                 <span class="badge bg-danger">Unpaid</span>
+                                            @else
+                                                <span class="badge bg-primary">Refund</span>
                                             @endif
                                         </td>
                                     </tr>

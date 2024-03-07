@@ -21,7 +21,7 @@ return new class extends Migration
             $table->double('discount',10,2)->nullable();
             $table->double('grand_total',10,2);
             $table->enum('payment_method',['cod','stripe'])->default('cod');
-            $table->enum('payment_status',['paid','unpaid'])->default('unpaid');
+            $table->enum('payment_status',['paid','unpaid','refund'])->default('unpaid');
             $table->enum('status',['pending','shipped','delivered','cancelled'])->default('pending');
             $table->timestamp('shipped_date')->nullable();
 
