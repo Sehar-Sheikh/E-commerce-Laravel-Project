@@ -392,7 +392,7 @@ class CartController extends Controller
             if ($request->isMethod('post')) {
             }
 
-            \Stripe\Stripe::setApiKey('sk_test_51OgRRpBEY16pz2dr7IgUMZu86ZtAUYE3XTkD83HQv6lLRMfGQ6Uu6XSJE8DrzDZmPPHX6ZoYi2h4dtIcMc5neCH600PSdRzd7n');
+            \Stripe\Stripe::setApiKey('YOUR_STRIPE_SECRET_KEY');
 
             $token = $request->input('stripeToken');
 

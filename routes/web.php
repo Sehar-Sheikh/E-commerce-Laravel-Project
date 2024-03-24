@@ -51,8 +51,6 @@ Route::post('/delete-item', [CartController::class, 'deleteItem'])->name('front.
 Route::get('/checkout', [CartController::class, 'checkout'])->name('front.checkout');
 Route::post('/process-checkout', [CartController::class, 'processCheckout'])->name('front.processCheckout');
 Route::get('/thanks/{orderId}', [CartController::class, 'thankyou'])->name('front.thankyou');
-// Route::get('thanks/{method}/{orderId}', [CartController::class, 'thankyou'])->name('front.thankyou');
-
 
 
 Route::post('/get-order-summery', [CartController::class, 'getOrderSummery'])->name('front.getOrderSummery');
@@ -96,13 +94,9 @@ Route::group(['prefix' => 'account'], function () {
 
 //Admin Routes
 Route::group(['prefix' => 'admin'], function () {
-        Route::get('/login', [AdminLoginController::class, 'index'])->name('admin.login');
-        Route::post('/authenticate', [AdminLoginController::class, 'authenticate'])->name('admin.authenticate');
+    Route::get('/login', [AdminLoginController::class, 'index'])->name('admin.login');
+    Route::post('/authenticate', [AdminLoginController::class, 'authenticate'])->name('admin.authenticate');
 
-    // Route::group(['middleware' => ['admin.guest', 'permission']], function () {
-
-    //     Route::get('/login', [AdminLoginController::class, 'index'])->name('admin.login');
-    // });
 
     Route::group(['middleware' => 'admin.auth'], function () {
 

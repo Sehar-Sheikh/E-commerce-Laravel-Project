@@ -33,13 +33,26 @@ class AdminLoginController extends Controller
                     auth('admin')->logout();
                     return redirect()->route('admin.login')->with('error', 'You do not have any roles assigned. Contact the administrator.');
                 }
-            } else {
+            }
+            else {
                 return redirect()->route('admin.login')->with('error', 'Either Email/Password is incorrect');
             }
-        } else {
+        }
+        else {
             return redirect()->route('admin.login')
                 ->withErrors($validator)
                 ->withInput($request->only('email'));
         }
     }
 }
+
+
+// $user = auth()->user();
+
+// if ($user->roles->isNotEmpty()) {
+//     // Redirect to the admin dashboard or any authorized section
+//     return redirect()->route('admin.dashboard');
+// } else {
+//     auth('admin')->logout();
+//     return redirect()->route('admin.login')->with('error', 'You do not have any roles assigned. Contact the administrator.');
+// }
