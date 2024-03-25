@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 
 class AuthController extends Controller
@@ -73,7 +74,17 @@ class AuthController extends Controller
                 if (session()->has('url.intended')) {
                     return redirect(session()->get('url.intended'));
                 }
-                return redirect()->route('account.profile');
+
+// Check if the authenticated user has any roles
+                    if (Auth::user()->roles->isEmpty()) {
+                    // Redirect to the account profile page
+                    return redirect()->route('account.profile');
+                } else {
+                    // Log out the user
+                    Auth::logout();
+                    // Redirect to the login page or any other page as needed
+                    return redirect()->route('account.login')->with('error', 'Sorry you are unauthorized to login.');
+                }
             } else {
                 return redirect()->route('account.login')
                     ->withInput($request->only('email'))
@@ -237,7 +248,7 @@ class AuthController extends Controller
     {
         return view('front.account.change-password');
     }
-    
+
     public function changePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [

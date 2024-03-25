@@ -24,7 +24,7 @@ class PermissionMiddleware
         }
         if(!is_null($permission))
         {
-            $permission = is_array($permission)? $permission : explode ('|',$permission);
+            $permissions = is_array($permission)? $permission : explode ('|',$permission);
 
         }
         if(is_null($permission))
