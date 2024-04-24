@@ -51,12 +51,9 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 - Dynamic pricing and shipping calculations based on user preferences and order details.
 - Personalized email notifications for order confirmations, shipping updates, and promotional campaigns.
 
-
 <hr></hr>
 
-
 ## <p align="center"><b><large><u>Project Demo Image</u></large></b></p>
-
 
 <hr></hr>
 
