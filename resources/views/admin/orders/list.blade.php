@@ -48,7 +48,7 @@
                                 <th>Customer</th>
                                 <th>Email</th>
                                 <th>Phone</th>
-                                <th>Status</th>
+                                <th>Order Status</th>
                                 <th>Amount</th>
                                 <th>Payment Method</th>
                                 <th>Date Purchased</th>
