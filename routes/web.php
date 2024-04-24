@@ -76,6 +76,7 @@ Route::group(['prefix' => 'account'], function () {
         Route::post('/login', [AuthController::class, 'authenticate'])->name('account.authenticate');
     });
 
+
     Route::group(['middleware' => 'auth'], function () {
         Route::get('/profile', [AuthController::class, 'profile'])->name('account.profile');
         Route::post('/update-profile', [AuthController::class, 'updateProfile'])->name('account.updateProfile');
@@ -98,8 +99,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/authenticate', [AdminLoginController::class, 'authenticate'])->name('admin.authenticate');
 
 
-//    Route::group(['middleware' => 'admin.auth'], function () {
-        Route::group(['middleware' => ['admin.auth','permission']], function () {
+    //    Route::group(['middleware' => 'admin.auth'], function () {
+    Route::group(['middleware' => ['admin.auth', 'permission']], function () {
 
         Route::get('/dashboard', [HomeController::class, 'index'])->name('admin.dashboard');
         Route::get('/logout', [HomeController::class, 'logout'])->name('admin.logout');

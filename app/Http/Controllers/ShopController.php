@@ -65,7 +65,7 @@ class ShopController extends Controller
             $products = $products->orderBy('id', 'DESC');
         }
 
-        $products = $products->paginate(6);
+        $products = $products->paginate(9);
 
         $data['categories'] = $categories;
         $data['brands'] = $brands;
@@ -106,8 +106,8 @@ class ShopController extends Controller
         $avgRatingPer = 0;
 
         if ($product->product_ratings_count > 0) {
-            $avgRating = number_format(($product->product_ratings_sum_rating / $product->product_ratings_count),2);
-            $avgRatingPer= ($avgRating*100)/5;
+            $avgRating = number_format(($product->product_ratings_sum_rating / $product->product_ratings_count), 2);
+            $avgRatingPer = ($avgRating * 100) / 5;
         }
         $data['avgRating'] = $avgRating;
         $data['avgRatingPer'] = $avgRatingPer;

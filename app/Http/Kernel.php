@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\PermissionMiddleware;
+use App\Http\Middleware\PreventAdminMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
@@ -74,7 +75,7 @@ class Kernel extends HttpKernel
         'role' => RoleMiddleware::class,
         'permission' => PermissionMiddleware::class,
         'role_or_permission' => RoleOrPermissionMiddleware::class,
-        
+
         // 'admin.auth' => PermissionMiddleware::class,
         // 'admin.guest' => PermissionMiddleware::class,
 

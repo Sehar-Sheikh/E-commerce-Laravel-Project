@@ -14,10 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 
 
 class AuthController extends Controller
@@ -75,8 +73,8 @@ class AuthController extends Controller
                     return redirect(session()->get('url.intended'));
                 }
 
-// Check if the authenticated user has any roles
-                    if (Auth::user()->roles->isEmpty()) {
+                // Check if the authenticated user has any roles
+                if (Auth::user()->roles->isEmpty()) {
                     // Redirect to the account profile page
                     return redirect()->route('account.profile');
                 } else {

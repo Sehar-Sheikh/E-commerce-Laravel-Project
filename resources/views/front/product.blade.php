@@ -260,7 +260,8 @@
                             @endphp
                             <div class="card product-card">
                                 <div class="product-image position-relative">
-                                    <a href="" class="product-img">
+                                    <a href="{{ route('front.product', ['slug' => $relProduct->slug]) }}"
+                                        class="product-img">
                                         @if (!empty($productImage->image))
                                             <img class="card-img-top"
                                                 src="{{ asset('uploads/product/small/' . $productImage->image) }}" />
@@ -291,11 +292,11 @@
                                                 <i class="fa fa-shopping-cart"></i> Add To Cart
                                             </a>
                                         @endif
-
                                     </div>
                                 </div>
                                 <div class="card-body text-center mt-3">
-                                    <a class="h6 link" href="">{{ $relProduct->title }}</a>
+                                    <a class="h6 link"
+                                        href="{{ route('front.product', ['slug' => $relProduct->slug]) }}">{{ $relProduct->title }}</a>
                                     <div class="price mt-2">
                                         <span class="h5"><strong>${{ $relProduct->price }}</strong></span>
                                         @if ($relProduct->compare_price > 0)

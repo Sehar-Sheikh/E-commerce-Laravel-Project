@@ -12,10 +12,8 @@ use App\Models\SubCategory;
 use App\Models\TempImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use \Intervention\Image\Facades\Image;
-use Termwind\Components\Raw;
 
 class ProductController extends Controller
 {
@@ -130,7 +128,6 @@ class ProductController extends Controller
             ]);
         }
     }
-
 
     public function edit($id, Request $request)
     {

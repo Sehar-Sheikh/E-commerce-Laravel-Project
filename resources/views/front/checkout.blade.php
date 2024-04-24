@@ -230,7 +230,7 @@
 
         // Create a Stripe client.
         var stripe = Stripe(
-            "YOUR_STRIPE_PUBLISH_KEY"
+            "pk_test_51OgRRpBEY16pz2drPI2JlDjK2e34M3pGcgl1g3nhJhrD9P5sq5h8jPEf9mLOxW7BRYjeaH3BcmQrvKQNElG1ScGY00ihwdSCKc"
         );
 
         // Create an instance of Elements.
