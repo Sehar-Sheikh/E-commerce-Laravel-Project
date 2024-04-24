@@ -66,9 +66,6 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 <hr></hr>
-<!-- <p style="font-size:22px;"><b><large><u><centre>Project Demo Image</centre></u></large></b></p> -->
-# Project Demo Image
----
 
 ## <p align="center"><b><large><u>Project Demo Image</u></large></b></p>
 
@@ -86,6 +83,35 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 <hr></hr>
 
 ![alt text](Home.png)
+
+<hr></hr>
+
+<b>Shop</b>
+<hr></hr>
+
+![alt text](Shop.png)
+
+<hr></hr>
+
+<b>Add to Cart</b>
+<hr></hr>
+
+![alt text](<Add to cart checkout.png>)
+
+<hr></hr>
+
+<b>Checkout</b>
+<hr></hr>
+
+![alt text](Process-checkout.png)
+
+<hr></hr>
+
+
+<b>User Profile</b>
+<hr></hr>
+
+![alt text](<Customer My-profile.png>)
 
 <hr></hr>
 
