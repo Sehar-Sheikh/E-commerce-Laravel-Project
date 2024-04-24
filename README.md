@@ -73,4 +73,4 @@ Admin Dashboard:
 Website Home page:
 ![alt text](Home.png)
 
-You can find all the project's demo images in the public folder.
+<b>You can find all the project's demo images in the public folder.</b>
