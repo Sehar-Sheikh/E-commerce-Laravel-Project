@@ -61,6 +61,7 @@
             <div class="row align-items-center py-3 d-none d-lg-flex justify-content-between">
                 <div class="col-lg-4 logo">
                     <a href="{{ route('front.home') }}" class="text-decoration-none">
+
                         <span class="h1 text-uppercase text-primary bg-dark px-2">Online</span>
                         <span class="h1 text-uppercase text-dark bg-primary px-2 ml-n1">SHOP</span>
                     </a>
@@ -114,6 +115,7 @@
         <div class="container">
             <nav class="navbar navbar-expand-xl" id="navbar">
                 <a href="index.php" class="text-decoration-none mobile-logo">
+
                     <span class="h2 text-uppercase text-primary bg-dark">Online</span>
                     <span class="h2 text-uppercase text-white px-2">SHOP</span>
                 </a>
