@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\PaymentMethod;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -23,6 +24,29 @@ class OrderController extends Controller
         $orders = $orders->paginate(10);
         $data['orders'] = $orders;
         return view('admin.orders.list', $data);
+    }
+
+    public function deleteOrder($id, Request $request)
+    {
+        $order = Order::find($id);
+
+        if (empty($order)) {
+
+            session()->flash('error', 'Record not found.');
+
+            return response()->json([
+                'status' => false,
+                'notFound' => true
+            ]);
+        }
+
+        $order->delete();
+        session()->flash('success', 'Order deleted successfully');
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Order deleted successfully'
+        ]);
     }
 
     public function detail($orderId)
@@ -55,40 +79,33 @@ class OrderController extends Controller
         ]);
     }
 
+    public function changePaymentStatus(Request $request, $id)
+    {
+        $order = Order::find($id);
 
-    // use App\Models\PaymentMethod;
+        if (!$order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Order not found'
+            ], 404);
+        }
 
-public function changePaymentStatus(Request $request, $id)
-{
-    $order = Order::find($id);
+        $order->payment_status = $request->paymentStatus;
+        $order->save();
 
-    if (!$order) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Order not found'
-        ], 404);
+        // Update payment_status in the payment_methods table
+        $paymentMethod = PaymentMethod::where('order_id', $order->id)->first();
+
+        if ($paymentMethod) {
+            $paymentMethod->payment_status = $request->paymentStatus;
+            $paymentMethod->save();
+        }
+
+        $message = 'Payment status updated successfully.';
+        session()->flash('success', $message);
+
+        return response()->json(['status' => true, 'message' => $message]);
     }
-
-    $order->payment_status = $request->paymentStatus;
-    $order->save();
-
-    // Update payment_status in the payment_methods table
-    $paymentMethod = PaymentMethod::where('order_id', $order->id)->first();
-
-    if ($paymentMethod) {
-        $paymentMethod->payment_status = $request->paymentStatus;
-        $paymentMethod->save();
-    }
-
-    $message = 'Payment status updated successfully.';
-    session()->flash('success', $message);
-
-    return response()->json(['status' => true, 'message' => $message]);
-}
-
-
-
-
 
     public function sendInvoiceEmail(Request $request, $orderId)
     {

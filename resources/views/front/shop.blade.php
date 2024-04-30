@@ -5,7 +5,8 @@
             <div class="light-font">
                 <ol class="breadcrumb primary-color mb-0">
                     <li class="breadcrumb-item"><a class="white-text" href="{{ route('front.home') }}">Home</a></li>
-                    <li class="breadcrumb-item active">Shop</li>
+                    <li class="breadcrumb-item"><a style="color: #3D464D"
+                            href="{{ route('front.shop') }}">Shop</a></li>
                 </ol>
             </div>
         </div>
@@ -154,7 +155,8 @@
                                             </div>
                                         </div>
                                         <div class="card-body text-center mt-3">
-                                            <a class="h6 link" href="{{ route('front.product', $product->slug) }}">{{ $product->title }}</a>
+                                            <a class="h6 link"
+                                                href="{{ route('front.product', $product->slug) }}">{{ $product->title }}</a>
                                             <div class="price mt-2">
                                                 <span class="h5"><strong>${{ $product->price }}</strong></span>
                                                 @if ($product->compare_price > 0)
@@ -228,7 +230,7 @@
             var keyword = $("#search").val();
 
             if (keyword.length > 0) {
-            url += '&search=' +keyword;
+                url += '&search=' + keyword;
             }
             url += '&sort=' + $("#sort").val();
             window.location.href = url;

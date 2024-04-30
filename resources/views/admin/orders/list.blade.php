@@ -53,6 +53,7 @@
                                 <th>Payment Method</th>
                                 <th>Date Purchased</th>
                                 <th>Payment Status</th>
+                                <th>Action</th>
 
                             </tr>
                         </thead>
@@ -94,6 +95,19 @@
                                                 <span class="badge bg-primary">Refund</span>
                                             @endif
                                         </td>
+                                        <td>
+                                            <a href="#" onclick="deleteOrder ({{ $order->id }})"
+                                                class="text-danger w-4 h-4 mr-1">
+                                                <svg wire:loading.remove.delay="" wire:target=""
+                                                    class="filament-link-icon w-4 h-4 mr-1"
+                                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                    fill="currentColor" aria-hidden="true">
+                                                    <path ath fill-rule="evenodd"
+                                                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                                        clip-rule="evenodd"></path>
+                                                </svg>
+                                            </a>
+                                        </td>
                                     </tr>
                                 @endforeach
                             @else
@@ -116,4 +130,27 @@
 @endsection
 
 @section('customJS')
+<script>
+function deleteOrder(id) {
+    var url = '{{ route('orders.deleteOrder', 'ID') }}';
+    var newUrl = url.replace("ID", id)
+
+    if (confirm("Are you sure you want to delete?")) {
+        $.ajax({
+            url: newUrl,
+            type: 'delete',
+            data: {},
+            dataType: 'json',
+            success: function(response) {
+
+                if (response["status"] == true) {
+                    window.location.href = "{{ route('orders.index') }}";
+                } else {
+                    window.location.href = "{{ route('orders.index') }}";
+                }
+            }
+        });
+    }
+}
+</script>
 @endsection

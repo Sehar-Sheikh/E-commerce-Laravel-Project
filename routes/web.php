@@ -178,6 +178,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         //Order Routes
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::delete('/orders/{order}', [OrderController::class, 'deleteOrder'])->name('orders.deleteOrder');
         Route::get('/orders/{id}', [OrderController::class, 'detail'])->name('orders.detail');
         Route::post('/order/change-status/{id}', [OrderController::class, 'changeOrderStatus'])->name('orders.changeOrderStatus');
         Route::post('/order/send-email/{id}', [OrderController::class, 'sendInvoiceEmail'])->name('orders.sendInvoiceEmail');
