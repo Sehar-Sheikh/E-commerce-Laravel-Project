@@ -42,13 +42,6 @@
                     <div class="bg-light right">
                         <h1>{{ $product->title }}</h1>
                         <div class="d-flex mb-3">
-                            {{-- <div class="text-primary mr-2">
-                                <small class="fas fa-star"></small>
-                                <small class="fas fa-star"></small>
-                                <small class="fas fa-star"></small>
-                                <small class="fas fa-star-half-alt"></small>
-                                <small class="far fa-star"></small>
-                            </div> --}}
                             <div class="star-rating product mt-2" title="">
                                 <div class="back-stars">
                                     <i class="fa fa-star" aria-hidden="true"></i>

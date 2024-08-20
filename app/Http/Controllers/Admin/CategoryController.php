@@ -8,11 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Category;
 use App\Models\TempImage;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Session;
 use Intervention\Image\Facades\Image;
 use Carbon\Carbon;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {

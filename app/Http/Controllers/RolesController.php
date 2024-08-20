@@ -66,6 +66,32 @@ class RolesController extends Controller
         return view('users.roles.show')->with(['role' => $role, 'permissions' => $permissions, 'rolePermissions' => $rolePermissions]);
     }
 
+    private function getRoles()
+    {
+        $data=Role::withCount(['users','permissions'])->get();
+        return DataTables::of($data)
+        ->addColumn('name', function($row)
+        {
+            return ucfirst($row->name);
+        })
+        ->addColumn('users_count', function($row)
+        {
+            return $row->users_count;
+        })
+        ->addColumn('permissions_count', function($row)
+        {
+            return $row->permissions_count;
+        })
+        ->addColumn('action',function($row){
+            $action = "";
+            $action.="<a class='btn btn-sm btn-success' id='btnShow' href='".route('users.roles.show', $row->id)."'><i class='fas fa-eye'></i></a>";
+            $action.=" <a class='btn btn-sm btn-warning' id='btnEdit' href='".route('users.roles.edit', $row->id)."'><i class='fas fa-edit'></i></a>";
+            $action.=" <button class='btn btn-sm btn-outline-danger' data-id='" .$row->id. "' id='btnDel'><i class='fas fa-trash'></i></button>";
+            return $action;
+        })
+        ->make(true);
+    }
+    
     /**
      * Show the form for editing the specified resource.
      */
@@ -113,31 +139,7 @@ class RolesController extends Controller
 
     }
 
-    private function getRoles()
-    {
-        $data=Role::withCount(['users','permissions'])->get();
-        return DataTables::of($data)
-        ->addColumn('name', function($row)
-        {
-            return ucfirst($row->name);
-        })
-        ->addColumn('users_count', function($row)
-        {
-            return $row->users_count;
-        })
-        ->addColumn('permissions_count', function($row)
-        {
-            return $row->permissions_count;
-        })
-        ->addColumn('action',function($row){
-            $action = "";
-            $action.="<a class='btn btn-sm btn-success' id='btnShow' href='".route('users.roles.show', $row->id)."'><i class='fas fa-eye'></i></a>";
-            $action.=" <a class='btn btn-sm btn-warning' id='btnEdit' href='".route('users.roles.edit', $row->id)."'><i class='fas fa-edit'></i></a>";
-            $action.=" <button class='btn btn-sm btn-outline-danger' data-id='" .$row->id. "' id='btnDel'><i class='fas fa-trash'></i></button>";
-            return $action;
-        })
-        ->make(true);
-    }
+
 
     private function getRolesPermissions($role)
     {
